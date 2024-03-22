@@ -1,0 +1,6 @@
+PyYAML>=6
+SQLAlchemy>=1.4
+fastapi>=0.79
+pydantic>=1.9
+uvicorn>=0.18
+furo>=2022.6

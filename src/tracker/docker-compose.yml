@@ -1,0 +1,14 @@
+version: '3.9'
+
+# NOTE: move passwords to env variable
+
+services:
+  pgadmin:
+    container_name: tracker-pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "50600:80"

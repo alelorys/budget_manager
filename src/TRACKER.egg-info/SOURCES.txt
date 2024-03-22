@@ -1,0 +1,7 @@
+setup.cfg
+setup.py
+src/TRACKER.egg-info/PKG-INFO
+src/TRACKER.egg-info/SOURCES.txt
+src/TRACKER.egg-info/dependency_links.txt
+src/TRACKER.egg-info/requires.txt
+src/TRACKER.egg-info/top_level.txt

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Zarządzanie budżetem</title>
+      <link rel="stylesheet" href="/templates/style.css" />
+      <!-- Font Awesome Cdn Link -->
+      <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+    </head>
+    <body>
+      <header class="header">
+        <div class="logo">
+          <a href="#">Budżet</a>
+        </div>
+    
+        <div class="header-icons">
+          <i class="fas fa-bell"></i>
+          <div class="account">
+            <h4>alorys</h4>
+          </div>
+        </div>
+      </header>
+      <div class="container">
+        <nav>
+          <div class="side_navbar">
+            <span>Menu</span>
+            <a href="#" class="active">Analiza</a>
+            <a href="#">Profil</a>
+            <a href="/operations/form">Operacje</a>
+            <a href="#">Pliki</a>
+    
+            
+          </div>
+        </nav>
+    
+        <div class="main-body">
+          <h2>Dashboard</h2>
+          <div class="promo_card">
+            <h1>Zarządzaj swoim budżetem</h1>
+            <span>Łatwo, przejrzyście</span>
+            <button>Dowiedz sie więcej</button>
+          </div>
+    
+          <div class="history_lists">
+            <div class="list1">
+              <div class="row">
+                <h4>Historia operacji</h4>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nazwa</th>
+                    <th>Kwota</th>
+                    <th>Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>buty</td>
+                    <td>129.99 zł</td>
+                    <td>03.03.2024</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+            </div>
+    
+            <div class="list2">
+              <div class="row">
+                <h4>Historia budżetu</h4>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Miesiąc</th>
+                    <th>Przewidywany</th>
+                    <th>Realny</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Marzec</td>
+                    <td>3500 zł</td>
+                    <td>3650 zł</td>
+                  </tr> 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    
+        <div class="sidebar">
+          <h4>Podsumowanie</h4>
+          <div class="balance">
+            <i class="bx bx-coin-stack icon"></i>
+            <div class="info">
+              <h5>Przewidywany</h5>
+              <span>{{ 0.00 or result }} zł</span>
+            </div>
+          </div>
+          <div class="balance">
+            <i class="bx bxs-coin-stack icon"></i>
+            <div class="info">
+              <h5>Rzeczywisty</h5>
+              <span>3650 zł</span>
+            </div>
+          </div>
+          <div class="balance">
+            <i class='bx bx-coin icon' ></i>
+            <div class="info">
+              <h5>Różnica</h5>
+              <span>150 zł</span>
+            </div>
+          </div>
+    
+        </div>
+      </div>
+    </body>
+    </html>
