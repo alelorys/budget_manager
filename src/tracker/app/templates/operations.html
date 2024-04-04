@@ -32,20 +32,46 @@
             
           </div>
         </nav>
-    
+        
         <div class="main-body">
           <h2>Formularz operacji</h2>
-          <form action="http://127.0.0.1:2345/operations/add" method='POST'>
+          <form id = "add">
             <label>Nazwa operacji</label><br>
-            <input type='text' id='name'><br>
+            <input type='text' id='name' name="name"><br>
             <label>Kwota</label><br>
-            <input type='number' id='amount'><br>
+            <input type='number' id='amount' name="amount"><br>
             <label>Kategoria</label><br>
-            <input type='text' id='name'><br>
+            <input type='text' id='category' name="category"><br>
             <label>Wpłata</label><br>
-            <input type="checkbox" id='type_operation'>
-            <input type='submit' value='Zapisz' id = 'add'>
+            <input type="checkbox" id='type' name="type">
+            <button type="submit" onclick="addOperation()">Zapisz</button>
           </form>
+          <script>
+            function addOperation(){
+              const formData = {
+                name: document.getElementById('name').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                type: document.getElementById('type').value,
+                category: document.getElementById('category').value
+              };
+              console.log(formData);
+      
+              fetch("http://127.0.0.1:2345/operations/add/",{
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept':'*/*',
+                  'Connection':'keep-alive',
+                  'Accept-Encoding':'gzip, deflate, br'},
+                body: JSON.stringify(formData)
+              })
+              .then(response => response.json())
+              .then(data => console.log(data))
+              .catch((error) => {
+                console.error('Error:', error)
+              });
+            }
+          </script> 
         </div>     
     
         <div class="sidebar">
@@ -74,5 +100,7 @@
     
         </div>
       </div>
+
+    
     </body>
     </html>

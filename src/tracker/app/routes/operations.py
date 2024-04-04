@@ -5,6 +5,7 @@ from datetime import datetime
 from tracker.db.utils import session_scope
 from tracker.db.db import Money
 from tracker.app.validators.services import MoneyAdd, MessageResponse, MoneyResponse
+from tracker.consts import Consts
 
 route = APIRouter(
     prefix='/operations',
@@ -12,24 +13,23 @@ route = APIRouter(
     responses={404:{'description':'Not found'}}
 )
 
-templates = Jinja2Templates(directory='templates')
-route.mount("/templates", StaticFiles(directory="templates"), name="templates")
+templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
+route.mount("/templates", StaticFiles(directory=Consts.TEMPLATES_PATH), name="templates")
 
 @route.get("/form")
 def form(request: Request):
-    return templates.TemplateResponse("operations.html", {"request":request})
+    return templates.TemplateResponse(name="operations.html", context={"request":request})
 
-@route.post("/add", response_model=MessageResponse)
-def add(request:MoneyAdd):
-    print(request)
+@route.post("/add/")
+async def add(addItems: MoneyAdd):
     try:
         with session_scope() as session:
             new_operation = Money(
-                name = request.name,
-                type_operation = request.type,
+                name = addItems.name,
+                type = addItems.type,
                 date = datetime.now(),
-                amount = request.amount,
-                category = request.category
+                amount = addItems.amount,
+                category = addItems.category
             )
             session.add(new_operation)
             session.commit()

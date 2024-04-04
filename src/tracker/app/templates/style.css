@@ -182,6 +182,7 @@ form{
   background: #FBF2EB;
   width: 70%;
   padding: 1rem;
+  border-radius: 5px;
 }
 
 form label{
@@ -192,7 +193,7 @@ form input[type=submit]{
   background:#DDDDBD;
   padding: 2px;
   width: 65px;
-  border-radius:5px;
+  border-radius:15%;
 }
 
 form input[type=submit]:hover{

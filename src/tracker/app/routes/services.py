@@ -5,14 +5,14 @@ from tracker.db.db import Money
 from tracker.db.utils import session_scope
 from tracker.app.validators.services import MoneyResponse,  MoneyList, Total, FileToPredict
 from tracker.predict.predict import predict_budget
-
+from tracker.consts import Consts
 route = APIRouter(
     prefix='/services',
     tags=['services'],
     responses={404: {'description':'Not found'}}
 )
-templates = Jinja2Templates(directory="templates")
-route.mount("/templates", StaticFiles(directory="templates"), name="templates")
+templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
+route.mount("/templates", StaticFiles(directory=Consts.TEMPLATES_PATH), name="templates")
 
 @route.get("/list", response_model=MoneyList)
 def show_all():
