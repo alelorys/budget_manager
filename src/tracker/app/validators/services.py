@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 class MoneyAdd(BaseModel):
-    name: str
-    type: bool
-    amount: float
-    category: str
+    name: Optional[str] = None
+    type: Optional[bool] = False
+    amount: Optional[float] = None
+    category: Optional[str] = None
     
     class Config:
         orm_mode = True

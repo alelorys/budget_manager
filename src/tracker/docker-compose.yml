@@ -3,6 +3,15 @@ version: '3.9'
 # NOTE: move passwords to env variable
 
 services:
+  postgresql:
+    container_name: tracker-postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: tracker-wystatkow
+      POSTGRES_PASSWORD: 12345678
+    ports:
+     - "2323:5432"
   pgadmin:
     container_name: tracker-pgadmin4
     image: dpage/pgadmin4

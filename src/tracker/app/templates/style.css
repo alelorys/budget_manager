@@ -182,20 +182,29 @@ form{
   background: #FBF2EB;
   width: 70%;
   padding: 1rem;
+  border-radius: 5px;
 }
 
 form label{
   font-weight: 300;
 }
 
-form input[type=submit]{
+form button{
   background:#DDDDBD;
   padding: 2px;
   width: 65px;
-  border-radius:5px;
+  border-radius:15%;
 }
 
-form input[type=submit]:hover{
+form input[type='text']{
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2)
+}
+form input[type='number']{
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2)
+}
+form button:hover{
   cursor:pointer;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
