@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from contextlib import contextmanager
 
 Base = declarative_base()
+
 SessionLocal = scoped_session(sessionmaker())
 
 url = 'postgresql://tracker-wystatkow:12345678@127.0.0.1:2323/tracker-wystatkow'
@@ -35,5 +36,3 @@ def create_objects(engine: Engine):
 def delete_objects(engine: Engine):
     Base.metadata.drop_all(engine)
 
-engine = initialize_db(echo=False)
-create_objects(engine)

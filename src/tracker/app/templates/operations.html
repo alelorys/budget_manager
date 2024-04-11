@@ -48,10 +48,11 @@
           </form>
           <script>
             function addOperation(){
+              
               const formData = {
                 name: document.getElementById('name').value,
                 amount: parseFloat(document.getElementById('amount').value),
-                type: document.getElementById('type').value,
+                type: document.getElementById("type").checked,
                 category: document.getElementById('category').value
               };
               console.log(formData);
