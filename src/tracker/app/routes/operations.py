@@ -14,7 +14,7 @@ route = APIRouter(
 )
 
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
-route.mount("/templates", StaticFiles(directory=Consts.TEMPLATES_PATH), name="templates")
+route.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 
 @route.get("/form")
 def form(request: Request):

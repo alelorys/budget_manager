@@ -208,3 +208,39 @@ form button:hover{
   cursor:pointer;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+table.scrolldown{
+  width: 100%;
+  border-spacing: 0;
+}
+
+table.scrolldown thead,
+table.scrolldown tbody{
+  display: block;
+}
+
+thead tr th{
+  height: 40px;
+  line-height: 20px;
+  text-align: center;
+}
+
+table.scrolldown tbody{
+  height: 150px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+tbody{
+border-top: 1px solid #DDDDBD;
+}
+
+tbody td,
+tbody th{
+  width: 100%;
+}
+
+td, th{
+  text-align: center;
+}
+
