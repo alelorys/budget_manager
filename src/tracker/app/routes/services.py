@@ -12,10 +12,10 @@ route = APIRouter(
     responses={404: {'description':'Not found'}}
 )
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
-route.mount("/templates", StaticFiles(directory=Consts.TEMPLATES_PATH), name="templates")
+route.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 
 @route.get("/list", response_model=MoneyList)
-def show_all():
+def show_all(request: Request):
     with session_scope() as session:
         payments = session.query(Money).all()
         
@@ -27,13 +27,15 @@ def show_all():
             infos.append(MoneyResponse(
                 id=payment.id,
             name=payment.name,
-            type=payment.type_operation,
+            type='wpłata' if payment.type is True else 'wydatek',
             date=payment.date,
             amount=payment.amount,
             category=payment.category
             ))
             
-        return MoneyList(operations=infos)
+        return templates.TemplateResponse('index.html',
+                                          context={'request':request,
+                                              'items':infos})
     
 @route.get("/detail/{id}", response_model=MoneyResponse)
 def show_detail(id:int):
@@ -46,7 +48,7 @@ def show_detail(id:int):
         info = MoneyResponse(
             id=payment.id,
             name=payment.name,
-            type=payment.type_operation,
+            type=payment.type,
             date=payment.date,
             amount=payment.amount,
             category=payment.category

@@ -3,7 +3,7 @@
     <head>
       <meta charset="UTF-8" />
       <title>Zarządzanie budżetem</title>
-      <link rel="stylesheet" href="/templates/style.css" />
+      <link rel="stylesheet" href="/static/style.css" />
       <!-- Font Awesome Cdn Link -->
       <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
     </head>
@@ -46,22 +46,27 @@
               <div class="row">
                 <h4>Historia operacji</h4>
               </div>
-              <table>
+              <table class="scrolldown">
                 <thead>
                   <tr>
-                    <th>Nazwa</th>
-                    <th>Kwota</th>
-                    <th>Data</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>buty</td>
-                    <td>129.99 zł</td>
-                    <td>03.03.2024</td>
-                  </tr>
-                  
-                </tbody>
+                  <th>Nazwa</th>
+                  <th>Kategoria</th>
+                  <th>Kwota</th>
+                  <th>Typ</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                <tr>
+                  <td>{{item.name}}</td>
+                  <td>{{item.category}}</td>
+                  <td>{{item.amount}}</td>
+                  <td>{{item.type}}</td>
+                  <td>{{item.date}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
               </table>
             </div>
     
@@ -115,5 +120,20 @@
     
         </div>
       </div>
+      <script>
+        fetch('http://127.0.0.1:2345/services/list')
+        .then(response =>{
+          if(!response.ok){
+            throw new Error('Błąd połączenia');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.error('Wystąpił błąd:',error);
+        });
+      </script>
     </body>
     </html>

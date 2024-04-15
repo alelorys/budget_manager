@@ -20,7 +20,7 @@ class MessageResponse(BaseModel):
 class MoneyResponse(BaseModel):
     id: int
     name: str
-    type: bool
+    type: str
     date: datetime
     amount: float
     category: str

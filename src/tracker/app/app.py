@@ -22,12 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
-app.mount("/templates", StaticFiles(directory=Consts.TEMPLATES_PATH), name="templates")
-
-@app.get("/")
-def read_root(request:Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
+app.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 
 app.include_router(services.route)
 app.include_router(operations.route)
