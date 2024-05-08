@@ -20,7 +20,7 @@ def show_all(request: Request):
         payments = session.query(Money).all()
         
         if not payments:
-            raise HTTPException(status_code=422, detail="Table is empty")
+            return templates.TemplateResponse("index.html", context={"request":request})
         
         infos = []
         for payment in payments:

@@ -23,3 +23,28 @@ function addOperation(){
       console.error('Error:', error)
     });
   }
+
+function addUser(){
+  const registerData = {
+    login: document.getElementById('login').value,
+    name: document.getElementById('name').value,
+    lastname: document.getElementById('lastname').value,
+    password: document.getElementById('password').value
+  };
+  console.log(registerData);
+  fetch("http://127.0.0.1:2345/register",{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+        'Accept':'*/*',
+        'Connection':'keep-alive',
+        'Accept-Encoding':'gzip, deflate, br'
+    },
+    body: JSON.stringify(registerData)
+  })
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch((error) => {
+    console.error("Error:", error)
+  });
+}
