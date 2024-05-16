@@ -31,6 +31,8 @@ function addUser(){
     lastname: document.getElementById('lastname').value,
     password: document.getElementById('password').value
   };
+
+  
   console.log(registerData);
   fetch("http://127.0.0.1:2345/register",{
     method: 'POST',
@@ -42,9 +44,17 @@ function addUser(){
     },
     body: JSON.stringify(registerData)
   })
-  .then(response => response.json())
+  .then(function(response){
+    if (response.status === 422){
+        alert("Użytkownik o tej nazwie już istnieje");
+    }
+    else if (response.status === 200){
+      alert("Dodano pomyślnie")
+    }
+  })
   .then(data => console.log(data))
   .catch((error) => {
     console.error("Error:", error)
   });
 }
+

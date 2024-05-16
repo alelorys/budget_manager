@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import  StaticFiles
 from datetime import datetime
 from tracker.db.utils import session_scope
 from tracker.db.db import Money
-from tracker.app.validators.services import MoneyAdd, MessageResponse, MoneyResponse
+from tracker.api.valid_user import get_current_user
+from tracker.api.validators.services import MoneyAdd, MessageResponse, MoneyResponse
 from tracker.consts import Consts
 
 route = APIRouter(
@@ -16,12 +18,15 @@ route = APIRouter(
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
 route.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 @route.get("/form")
-def form(request: Request):
+async def form(request: Request, token: str = Depends(oauth2_scheme)):
+    await get_current_user(token)
     return templates.TemplateResponse(name="operations.html", context={"request":request})
 
 @route.post("/add/")
-async def add(addItems: MoneyAdd):
+async def add(addItems: MoneyAdd, token:str = Depends(oauth2_scheme)):
+    await get_current_user(token)
     try:
         with session_scope() as session:
             new_operation = Money(

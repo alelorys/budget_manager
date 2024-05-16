@@ -245,3 +245,18 @@ td, th{
   text-align: center;
 }
 
+::-webkit-scrollbar{
+  width: 20px;
+}
+
+::-webkit-scrollbar-track{
+  background: #FFDCD0;
+}
+::-webkit-scrollbar-thumb{
+  background: #DDDDBD;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background: #c4cfa8;
+}
