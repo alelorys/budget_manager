@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zarządzanie budżetem</title>
+        <link rel="stylesheet" href="/static/sing_inup.css">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+
+    </head>
+    <body>
+        <div class="circle"></div>
+        <div class="card">
+            <div class="logo">
+                <i class='bx bxs-coin' style='color:#ddddbd' ></i>
+            </div>
+            <h2>Zaloguj się</h2>
+            <form class="register" id="loginForm">
+                <input type="text" id="login" placeholder="podaj login..." autocomplete="on">
+                <input type="password" id="password" placeholder="podaj hasło..." autocomplete="on">
+                <button type="submit">Zaloguj</button>
+            </form>
+            <script>
+                document.getElementById('loginForm').addEventListener("submit", function(event){
+                    event.preventDefault();
+
+                    var loginData = new FormData(event.target);
+
+                    fetch('/token',{
+                        method:'POST',
+                        method:'POST',
+                        body: loginData
+                    })
+                    .then(response => response.json())
+                    .then(data =>{
+                        localStorage.setItem('token', data.access_token);
+                        window.location.href = '/services/list';
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            </script>
+            <footer>
+                Nie mam konta
+                <a href="/register_form">Zarejestruj</a>
+            </footer>
+        </div>
+    </body>
+</html>

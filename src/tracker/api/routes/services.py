@@ -1,11 +1,14 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from tracker.db.db import Money
 from tracker.db.utils import session_scope
-from tracker.app.validators.services import MoneyResponse,  MoneyList, Total, FileToPredict
+from tracker.api.valid_user import get_current_user
+from tracker.api.validators.services import MoneyResponse,  MoneyList, Total, FileToPredict
 from tracker.predict.predict import predict_budget
 from tracker.consts import Consts
+
 route = APIRouter(
     prefix='/services',
     tags=['services'],
@@ -13,14 +16,16 @@ route = APIRouter(
 )
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
 route.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 @route.get("/list", response_model=MoneyList)
-def show_all(request: Request):
+async def show_all(request: Request, token:str = Depends(oauth2_scheme)):
+    await get_current_user(token)
     with session_scope() as session:
         payments = session.query(Money).all()
         
         if not payments:
-            raise HTTPException(status_code=422, detail="Table is empty")
+            return templates.TemplateResponse("index.html", context={"request":request})
         
         infos = []
         for payment in payments:
@@ -38,7 +43,8 @@ def show_all(request: Request):
                                               'items':infos})
     
 @route.get("/detail/{id}", response_model=MoneyResponse)
-def show_detail(id:int):
+async def show_detail(id:int, token: str = Depends(oauth2_scheme)):
+    await get_current_user(token)
     with session_scope() as session:
         payment = session.query(Money).filter(Money.id==id).first()
         
@@ -56,7 +62,8 @@ def show_detail(id:int):
         return info
     
 @route.get('/total', response_model=Total)
-def total():
+async def total(token:str = Depends(oauth2_scheme)):
+    await get_current_user(token)
     with session_scope() as session:
         
         income = 0.0
@@ -75,8 +82,8 @@ def total():
     return Total(total=total_amount)
 
 @route.get('/predict')
-def predict(request: Request):
-    
+async def predict(request: Request, token:str=Depends(oauth2_scheme)):
+    await get_current_user(token)
     model, last_row = predict_budget()
     
     result = model.predict(last_row.values.reshape(1, -1))

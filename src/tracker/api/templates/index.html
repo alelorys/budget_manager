@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-    <html lang="en">
+    <html lang="pl">
     <head>
       <meta charset="UTF-8" />
       <title>Zarządzanie budżetem</title>
@@ -57,15 +57,26 @@
                 </tr>
               </thead>
               <tbody>
-                {% for item in items %}
-                <tr>
-                  <td>{{item.name}}</td>
-                  <td>{{item.category}}</td>
-                  <td>{{item.amount}}</td>
-                  <td>{{item.type}}</td>
-                  <td>{{item.date}}</td>
-                </tr>
-                {% endfor %}
+                {% if items is none %}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                {% else %}
+                  {% for item in items %}
+                  <tr>
+                    <td>{{item.name}}</td>
+                    <td>{{item.category}}</td>
+                    <td>{{item.amount}}</td>
+                    <td>{{item.type}}</td>
+                    <td>{{item.date}}</td>
+                  </tr>
+                  {% endfor %}
+                {% endif %}
+                
               </tbody>
               </table>
             </div>
