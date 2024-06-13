@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
+from urllib import response
 from fastapi import FastAPI, Request, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +35,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Uwaga: w produkcji określ konkretne źródła
+    allow_origins=["http://127.0.0.1:2345"],  # Uwaga: w produkcji określ konkretne źródła
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,11 +52,12 @@ async def register_form(request:Request):
 async def login_form(request:Request):
     return templates.TemplateResponse(name="login.html", context={"request":request})
 
-@app.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+@app.post("/token/")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     with session_scope() as session:
-        users = session.query(user_db).all()
-        user = authenticate_user(users, form_data.username, form_data.password)
+        print("username",form_data.username)
+        users = session.query(user_db).filter(user_db.login==form_data.username).first()
+        user = authenticate_user(users.as_dict(), form_data.username, form_data.password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -63,9 +66,12 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
             )
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user.login}, expires_delta=access_token_expires
+            data={"sub": user.username}, expires_delta=access_token_expires
         )
-        return Token(access_token=access_token, token_type="bearer")
+        token = Token(access_token=access_token, token_type="bearer")
+        response = RedirectResponse(url='/services/list')
+        response.set_cookie(key="Authorization", value=f"Bearer {token.access_token}")
+    return response
     
 @app.post("/register")
 async def register(register: AddUser):
@@ -90,7 +96,7 @@ async def register(register: AddUser):
             raise HTTPException(status_code=422, detail="Something goes wrong")
     
 app.include_router(services.route)
-#app.include_router(operations.route)
+app.include_router(operations.route)
 if __name__ == "__main__":
     uvicorn.run('app:app',
                 host='127.0.0.1',

@@ -25,6 +25,7 @@ def get_password_hash(password):
 
 def get_user(db, username: str):
     if username in db:
+       
         user_dict = db[username]
         return UserInDB(**user_dict)
     
@@ -34,6 +35,8 @@ def authenticate_user(fake_db, username: str, password: str):
         return False
     if not verify_password(password, user.password):
         return False
+    
+    
     return user
 
 
@@ -47,7 +50,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -55,15 +58,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         )
         with session_scope() as session:
             users = session.query(user_db).all()
+            
             try:
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 username: str = payload.get("sub")
+                print(username)
                 if username is None:
                     raise credentials_exception
                 token_data = TokenData(username=username)
             except JWTError:
                 raise credentials_exception
-            user = get_user(users, username=token_data.login)
-            if user is None:
+            user = [get_user(user.as_dict(), username=token_data.username) for user in users
+                    if get_user(user.as_dict(), username=token_data.username)]
+            print("user valid",user)
+            if user[0] is None:
                 raise credentials_exception
-        return user
+        
+        return user[0]

@@ -19,30 +19,34 @@ route.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 @route.get("/list", response_model=MoneyList)
-async def show_all(request: Request, token:str = Depends(oauth2_scheme)):
-    await get_current_user(token)
+async def show_all(request: Request):
+    token = request.cookies.get("Authorization")
+    print(token)
     with session_scope() as session:
         payments = session.query(Money).all()
         
-        if not payments:
-            return templates.TemplateResponse("index.html", context={"request":request})
         
         infos = []
-        for payment in payments:
-            infos.append(MoneyResponse(
-                id=payment.id,
-            name=payment.name,
-            type='wpłata' if payment.type is True else 'wydatek',
-            date=payment.date,
-            amount=payment.amount,
-            category=payment.category
-            ))
+        if payments:
+            for payment in payments:
+                infos.append(MoneyResponse(
+                    id=payment.id,
+                    user_id=payment.user_id,
+                name=payment.name,
+                type='wpłata' if payment.type is True else 'wydatek',
+                date=payment.date,
+                amount=payment.amount,
+                category=payment.category
+                ))
+                
             
-        return templates.TemplateResponse('index.html',
-                                          context={'request':request,
-                                              'items':infos})
+        return templates.TemplateResponse('index.html', context={
+            "request":request,
+            "items":infos,
+            "token":token
+        })
     
-@route.get("/detail/{id}", response_model=MoneyResponse)
+@route.get("{id}/detail/", response_model=MoneyResponse)
 async def show_detail(id:int, token: str = Depends(oauth2_scheme)):
     await get_current_user(token)
     with session_scope() as session:

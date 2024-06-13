@@ -37,6 +37,7 @@
         
         <div class="main-body">
           <h2>Formularz operacji</h2>
+          {{ user_id }}
           <form id = "add">
             <label>Nazwa operacji</label><br>
             <input type='text' id='name' name="name"><br>
@@ -48,8 +49,38 @@
             <input type="checkbox" id='type' name="type">
             <button type="submit" onclick="addOperation()">Zapisz</button>
           </form>
-          <script src="/static/script.js">
-            
+          <script >
+            function addOperation(){    
+    const userId = "{{ user_id }}";
+    const token =  "{{ token }}";
+
+    console.log(userId);
+    console.log(token);
+    const formData = {
+      user_id: userId,
+      name: document.getElementById('name').value,
+      amount: parseFloat(document.getElementById('amount').value),
+      type: document.getElementById("type").checked,
+      category: document.getElementById('category').value
+    };
+    console.log(formData);
+
+    fetch("http://127.0.0.1:2345/operations/add/",{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':`Bearer ${token}`,
+        'Accept':'*/*',
+        'Connection':'keep-alive',
+        'Accept-Encoding':'gzip, deflate, br'},
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch((error) => {
+      console.error('Error:', error)
+    });
+  }
           </script> 
         </div>     
     
@@ -58,6 +89,29 @@
         </div>
       </div>
 
-    
+      <script>
+        document.addEventListener('DOMCOntentLoaded', async function(){
+          const token = "{{ token }}";
+          if (!token){
+            window.location.href = '/login_form';
+            return;
+          }
+
+          const response = await fetch('http://127.0.0.1:2345/operations/form',{
+            method: 'GET',
+            headers:{
+              'Authorization': token
+            }
+          });
+
+          if (response.ok){
+            const data = await response.json();
+          } else {
+            console.error("Coś poszło nie tak", await response.json());
+          }
+        });
+
+        
+      </script>
     </body>
     </html>

@@ -22,6 +22,20 @@ class Users(Base):
     password = Column(String)
 
     money = relationship("Money")
+
+    def __repr__(self):
+        return f"Users(id={self.id!r}, login={self.login!r}, name={self.name!r}, lastname={self.lastname!r}, password={self.password!r})"
+    
+    def as_dict(self):
+        return {
+            self.login:{
+                "id":self.id,
+                "username":self.login,
+                "password":self.password,
+                "name":self.name,
+                "lastname":self.lastname
+            }
+        }
 class Money(Base):
     __tablename__ = 'money'
     

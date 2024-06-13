@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 
 class MoneyAdd(BaseModel):
+    user_id: int
     name: Optional[str] = None
     type: Optional[bool] = False
     amount: Optional[float] = None
@@ -19,6 +20,7 @@ class MessageResponse(BaseModel):
     
 class MoneyResponse(BaseModel):
     id: int
+    user_id: int
     name: str
     type: str
     date: datetime
