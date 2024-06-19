@@ -5,11 +5,11 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    login: str
+    username: str
     
 class User(BaseModel):
     id: int
-    login: str
+    username: str
     name: str
     lastname: str
 
@@ -17,7 +17,7 @@ class UserInDB(User):
     password: str
 
 class AddUser(BaseModel):
-    login: str
+    username: str
     name: str
     lastname: str
     password: str

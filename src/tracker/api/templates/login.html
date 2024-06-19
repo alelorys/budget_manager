@@ -17,28 +17,34 @@
             </div>
             <h2>Zaloguj się</h2>
             <form class="register" id="loginForm">
-                <input type="text" id="login" placeholder="podaj login..." autocomplete="on">
+                <input type="text" id="username" placeholder="podaj login..." autocomplete="on">
                 <input type="password" id="password" placeholder="podaj hasło..." autocomplete="on">
-                <button type="submit">Zaloguj</button>
+                <button type="submit" onclick="logUser()">Zaloguj</button>
             </form>
             <script>
-                document.getElementById('loginForm').addEventListener("submit", function(event){
-                    event.preventDefault();
-
-                    var loginData = new FormData(event.target);
+                async function logUser(){
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
 
                     fetch('/token',{
-                        method:'POST',
-                        method:'POST',
-                        body: loginData
-                    })
-                    .then(response => response.json())
-                    .then(data =>{
-                        localStorage.setItem('token', data.access_token);
-                        window.location.href = '/services/list';
-                    })
-                    .catch(error => console.error('Error:', error));
+                    method:'POST',
+                    authorization:'',
+                    headers:{
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
                 });
+                
+                const data = await response.json();
+                if (response.ok){
+                    console.log(data.access_token);
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = '/services/list';
+                } else {
+                    console.error('Login failed', data);
+                }
+            }
+                
             </script>
             <footer>
                 Nie mam konta

@@ -1,6 +1,13 @@
-function addOperation(){
-              
+const url = 'http://127.0.0.1:2345'
+function addOperation(){    
+    const body = document.body;
+    const userId = body.dataset.userId;
+    const token =  body.dataset.token;
+
+    console.log(userId);
+    console.log(token);
     const formData = {
+      user_id: userId,
       name: document.getElementById('name').value,
       amount: parseFloat(document.getElementById('amount').value),
       type: document.getElementById("type").checked,
@@ -8,10 +15,11 @@ function addOperation(){
     };
     console.log(formData);
 
-    fetch("http://127.0.0.1:2345/operations/add/",{
+    fetch(url+"/operations/add/",{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${token}`,
         'Accept':'*/*',
         'Connection':'keep-alive',
         'Accept-Encoding':'gzip, deflate, br'},
@@ -34,7 +42,7 @@ function addUser(){
 
   
   console.log(registerData);
-  fetch("http://127.0.0.1:2345/register",{
+  fetch(url+"/register",{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -58,3 +66,19 @@ function addUser(){
   });
 }
 
+/*document.getElementById('loginForm').addEventListener("submit", function(event){
+  event.preventDefault();
+
+  var loginData = new FormData(event.target);
+
+  fetch('/token',{
+      method:'POST',
+      body: loginData
+  })
+  .then(response => response.json())
+  .then(data =>{
+      localStorage.setItem('token', data.access_token);
+      window.location.href = '/services/list';
+  })
+  .catch(error => console.error('Error:', error));
+});*/

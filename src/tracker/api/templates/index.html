@@ -7,7 +7,8 @@
       <!-- Font Awesome Cdn Link -->
       <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
     </head>
-    <body>
+    <body onload="getData();">
+      
       <header class="header">
         <div class="logo">
           <a href="#">Budżet</a>
@@ -132,6 +133,34 @@
         </div>
       </div>
       <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const token = "{{ token }}";
+          console.log("Token: ", token);
+
+          async function getData(){
+            if (!token) {
+              console.error("No token found");
+              return;
+            }
+
+            const response = await fetch('http://127.0.0.1:2345/services/list',{
+              method: "GET",
+              headers:{
+                'Authorization': token,
+              },
+            });
+
+            console.log('Response:',response);
+            if (response.ok){
+              const data = await response.json();
+              console.log("Pobrane dane:",data);
+            } else {
+              console.error("Coś poszło nie tak", await response.json());
+            }
+          }
+        })
+      </script>
+      <!--<script>
         fetch('http://127.0.0.1:2345/services/list')
         .then(response =>{
           if(!response.ok){
@@ -145,6 +174,6 @@
         .catch(error => {
           console.error('Wystąpił błąd:',error);
         });
-      </script>
+      </script>-->
     </body>
     </html>
