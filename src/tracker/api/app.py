@@ -55,7 +55,6 @@ async def login_form(request:Request):
 @app.post("/token/")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     with session_scope() as session:
-        print("username",form_data.username)
         users = session.query(user_db).filter(user_db.login==form_data.username).first()
         user = authenticate_user(users.as_dict(), form_data.username, form_data.password)
         if not user:

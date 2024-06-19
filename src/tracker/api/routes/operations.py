@@ -29,11 +29,8 @@ async def form(request: Request):
     token = request.cookies.get("Authorization")
     token = token.replace("Bearer ","")
 
-    print(token.rsplit(".",1))
     user = await get_current_user(token)
-    # decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    # print(decoded)
-    print(user)
+   
     return templates.TemplateResponse(name="operations.html", context={"request":request,
                                                                        "token":token,
                                                                        "user_id":user.id})

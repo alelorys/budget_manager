@@ -39,6 +39,7 @@
                 if (response.ok){
                     console.log(data.access_token);
                     localStorage.setItem('token', data.access_token);
+                    window.location.href = '/services/list';
                 } else {
                     console.error('Login failed', data);
                 }

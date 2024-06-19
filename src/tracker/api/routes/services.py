@@ -21,9 +21,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 @route.get("/list", response_model=MoneyList)
 async def show_all(request: Request):
     token = request.cookies.get("Authorization")
-    print(token)
+    
+    user = await get_current_user(token.replace("Bearer ",""))
+    
     with session_scope() as session:
-        payments = session.query(Money).all()
+        payments = session.query(Money).filter(Money.user_id==user.id).all()
         
         
         infos = []
