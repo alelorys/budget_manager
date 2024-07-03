@@ -33,7 +33,8 @@ async def form(request: Request):
    
     return templates.TemplateResponse(name="operations.html", context={"request":request,
                                                                        "token":token,
-                                                                       "user_id":user.id})
+                                                                       "user_id":user.id,
+                                                                       "login":user.username})
 
 @route.post("/add/")
 async def add(addItems: MoneyAdd):

@@ -25,7 +25,7 @@
         <nav>
           <div class="side_navbar">
             <span>Menu</span>
-            <a href="/services/list">Historia</a>
+            <a href="/services/list" class="active">Historia</a>
             <a href="/analise">Analiza</a>
             <a href="/operations/form">Operacje</a>
             <a href="/files">Pliki</a>
@@ -42,28 +42,67 @@
             <span>Łatwo, przejrzyście</span>
             <button>Dowiedz sie więcej</button>
           </div>
-          <hr>
-          <div class="buttons">
-            
-            <div class="pages">
-              <i class="bx bx-list-plus"></i>
-              <a href="/services/list">Historia</a>
-
+    
+          <div class="history_lists">
+            <div class="list1">
+              <div class="row">
+                <h4>Historia operacji</h4>
+              </div>
+              <table class="scrolldown">
+                <thead>
+                  <tr>
+                  <th>Nazwa</th>
+                  <th>Kategoria</th>
+                  <th>Kwota</th>
+                  <th>Typ</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if items is none %}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                {% else %}
+                  {% for item in items %}
+                  <tr>
+                    <td>{{item.name}}</td>
+                    <td>{{item.category}}</td>
+                    <td>{{item.amount}}</td>
+                    <td>{{item.type}}</td>
+                    <td>{{item.date}}</td>
+                  </tr>
+                  {% endfor %}
+                {% endif %}
+                
+              </tbody>
+              </table>
             </div>
-            <div class="pages">
-              <i class="bx bx-analyse"></i>
-              <a href="/services/list">Analiza</a>
-
-            </div>
-            <div class="pages">
-              <i class="bx bx-plus-circle"></i>
-              <a href="/operations/form">Operacje</a>
-
-            </div>
-            <div class="pages">
-              <i class="bx bxs-shopping-bag"></i>
-              <a href="/services/list">Budżet</a>
-
+    
+            <div class="list2">
+              <div class="row">
+                <h4>Historia budżetu</h4>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Miesiąc</th>
+                    <th>Przewidywany</th>
+                    <th>Realny</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Marzec</td>
+                    <td>3500 zł</td>
+                    <td>3650 zł</td>
+                  </tr> 
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -74,21 +113,33 @@
             <i class="bx bx-coin-stack icon"></i>
             <div class="info">
               <h5>Przewidywany</h5>
-              <span>{{ 0.00 or result }} zł</span>
+              {% if result %}
+              <span>{{ result }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
             </div>
           </div>
           <div class="balance">
             <i class="bx bxs-coin-stack icon"></i>
             <div class="info">
               <h5>Rzeczywisty</h5>
-              <span>3650 zł</span>
+              {% if balance %}
+              <span>{{ balance }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
             </div>
           </div>
           <div class="balance">
             <i class='bx bx-coin icon' ></i>
             <div class="info">
               <h5>Różnica</h5>
-              <span>150 zł</span>
+              {% if difference %}
+              <span>{{ difference }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
             </div>
           </div>
     

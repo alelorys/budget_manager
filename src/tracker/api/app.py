@@ -26,7 +26,7 @@ from tracker.api.validators.login import (
     UserInDB,
     AddUser)
 
-from tracker.api.valid_user import authenticate_user, create_access_token, get_password_hash
+from tracker.api.valid_user import authenticate_user, create_access_token, get_password_hash, get_current_user
 from tracker.api.valid_user import ACCESS_TOKEN_EXPIRE_MINUTES
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -68,10 +68,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         token = Token(access_token=access_token, token_type="bearer")
-        response = RedirectResponse(url='/services/list')
+        response = RedirectResponse(url='dashboard')
         response.set_cookie(key="Authorization", value=f"Bearer {token.access_token}")
     return response
     
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    token = request.cookies.get("Authorization")
+    user = await get_current_user(token.replace("Bearer ",""))
+
+    return templates.TemplateResponse("index.html", context={
+        "request":request,
+        "login":user.username,
+        "token":token
+    })
 @app.post("/register")
 async def register(register: AddUser):
     with session_scope() as session:
