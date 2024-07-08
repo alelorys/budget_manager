@@ -260,3 +260,44 @@ td, th{
 ::-webkit-scrollbar-thumb:hover{
   background: #c4cfa8;
 }
+
+.container .main-body .buttons{
+  display: flex;
+  justify-content: space-around;
+  cursor: pointer;
+}
+
+.container .main-body .buttons .pages{
+  background: #fff;
+  width: 20%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(136,148,171,0.2), 0 24px 20px -24px rgba(71,82,107,0.1);
+}
+
+.container .main-body .buttons .pages i{
+  font-size: 24px;
+  color: #ddddbd;
+}
+
+.container .main-body .buttons .pages a{
+  font-size: 24px;
+  color: #DDDDBD;
+  text-decoration: none;
+}
+.container .main-body .buttons .pages a:visited,
+.container .main-body .buttons .pages a:hover{
+  color: #DDDDBD;
+  text-decoration: none;
+}
+
+.container .main-body .buttons .pages:hover{
+  box-shadow: 0 2px 6px rgba(221, 221, 189,0.2), 0 24px 20px -24px rgba(221, 221, 189,0.1);
+
+}

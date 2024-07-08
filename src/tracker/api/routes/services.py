@@ -42,10 +42,11 @@ async def show_all(request: Request):
                 ))
                 
             
-        return templates.TemplateResponse('index.html', context={
+        return templates.TemplateResponse('history.html', context={
             "request":request,
             "items":infos,
-            "token":token
+            "token":token,
+            "login": user.username
         })
     
 @route.get("{id}/detail/", response_model=MoneyResponse)
