@@ -22,6 +22,7 @@ class Users(Base):
     password = Column(String)
 
     money = relationship("Money")
+    bugdet = relationship("Predict")
 
     def __repr__(self):
         return f"Users(id={self.id!r}, login={self.login!r}, name={self.name!r}, lastname={self.lastname!r}, password={self.password!r})"
@@ -46,11 +47,15 @@ class Money(Base):
     date = Column(DateTime)
     amount = Column(Float)
     category = Column(String)
+
+    def __repr__(self):
+        return f"Money(id={self.id!r},user_id={self.user_id!r},name={self.name!r},type={self.type!r},date={self.date!r}, amount={self.amount!r},category={self.category!r})"
     
 class Predict(Base):
     __tablename__ = "predict"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey(Users.id),nullable=False)
     predicted = Column(Float)
     real = Column(Float)
     date = Column(DateTime)

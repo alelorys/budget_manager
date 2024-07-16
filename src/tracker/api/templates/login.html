@@ -26,23 +26,29 @@
                     const username = document.getElementById('username').value;
                     const password = document.getElementById('password').value;
 
-                    fetch('/token',{
+                    fetch('http://127.0.0.1:2345/token',{
                     method:'POST',
                     authorization:'',
                     headers:{
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-                });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem('token', data.access_token)
+                    window.location.href = '/dashboard';
+                })
+                .catch(error => console.error('Error: ', error));
                 
-                const data = await response.json();
+               /* const data = await response.json();
                 if (response.ok){
                     console.log(data.access_token);
                     localStorage.setItem('token', data.access_token);
-                    window.location.href = '/services/list';
+                    window.location.href = '/dashboard';
                 } else {
                     console.error('Login failed', data);
-                }
+                }*/
             }
                 
             </script>
