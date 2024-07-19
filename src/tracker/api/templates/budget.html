@@ -84,21 +84,21 @@
             <i class="bx bx-coin-stack icon"></i>
             <div class="info">
               <h5>Przewidywany</h5>
-              <span id="predicted">{{ predicted }} zł</span>
+              <span id="predicted">{{ predict_response.predicted }} zł</span>
             </div>
           </div>
           <div class="balance">
             <i class="bx bxs-coin-stack icon"></i>
             <div class="info">
               <h5>Rzeczywisty</h5>
-              <span>3650 zł</span>
+              <span>{{ predict_response.real }} zł</span>
             </div>
           </div>
           <div class="balance">
             <i class='bx bx-coin icon' ></i>
             <div class="info">
               <h5>Różnica</h5>
-              <span>150 zł</span>
+              <span>{{ predict_response.predicted - predict_response.real }} zł</span>
             </div>
           </div>
     
@@ -109,7 +109,7 @@
         function predict(){
           const token = "{{ token }}"
           fetch('http://127.0.0.1:2345/budget/predict',{
-            method: 'GET',
+            method: 'POST',
             headers:{
               'Authorization': token
             }

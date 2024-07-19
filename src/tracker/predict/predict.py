@@ -25,9 +25,9 @@ def get_data_from_file(path):
         return data, list(df.columns)
             
 
-def train_model():
+def train_model(user_id):
     
-    data:pd.DataFrame = pd.DataFrame.from_dict(get_categories_from_db()[0], orient='columns')
+    data:pd.DataFrame = pd.DataFrame.from_dict(get_categories_from_db(user_id=user_id)[0], orient='columns')
     data = data.fillna(0)
     Y = data['Suma']
     Y = Y[:-1]
@@ -50,15 +50,17 @@ def get_last_month():
 
     return days, month
 
-def get_categories_from_db():
+def get_categories_from_db(user_id):
 
     days,month = get_last_month()
     data, categories_list = get_data_from_file(Consts.CSV_FILE)
     categories_dict = {}
     with session_scope() as session:
-        payments = session.query(Money.category, Money.amount).filter(Money.date.between(
+        payments = session.query(Money.category, Money.amount).filter(and_(
+            Money.user_id == user_id,
+            Money.date.between(
             days[0],days[-1]
-        )).all()
+        ))).all()
         
         total = [pay[1] for pay in payments]
         
@@ -79,13 +81,13 @@ def get_categories_from_db():
     
     return data, df
 
-def predict():
-    model = train_model()
-    df:pd.DataFrame = get_categories_from_db()[1]
+def predict(user_id:int):
+    model = train_model(user_id)
+    df:pd.DataFrame = get_categories_from_db(user_id)[1]
     df.drop(columns=['Suma'], inplace=True)
     result = model.predict(df.values)
     
     return round(result[0], 2)
 
-predict()
+
 

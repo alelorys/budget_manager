@@ -6,7 +6,6 @@ from tracker.db.db import Money
 from tracker.db.utils import session_scope
 from tracker.api.valid_user import get_current_user
 from tracker.api.validators.services import MoneyResponse,  MoneyList, Total, FileToPredict
-from tracker.predict.predict import predict_budget
 from tracker.consts import Consts
 
 route = APIRouter(
@@ -87,13 +86,3 @@ async def total(token:str = Depends(oauth2_scheme)):
                 outcome += payment.amount
         total_amount = income - outcome
     return Total(total=total_amount)
-
-@route.get('/predict')
-async def predict(request: Request, token:str=Depends(oauth2_scheme)):
-    await get_current_user(token)
-    model, last_row = predict_budget()
-    
-    result = model.predict(last_row.values.reshape(1, -1))
-    #{"przewidywana wartość": round(result[0], 2)}
-    return templates.TemplateResponse("index.html", {"request":request,
-                                                                "result": round(result[0], 2)})
