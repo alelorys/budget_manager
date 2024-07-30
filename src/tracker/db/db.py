@@ -10,7 +10,7 @@ from sqlalchemy import (
     DateTime)
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from tracker.db.utils import Base, initialize_db, create_objects, SessionLocal
+from tracker.db.utils import Base, initialize_db, create_objects, SessionLocal, delete_objects
 
 class Users(Base):
     __tablename__ = 'users'
@@ -46,7 +46,7 @@ class Money(Base):
     type = Column(String)
     date = Column(DateTime)
     amount = Column(Float)
-    category = Column(String)
+    category = Column(String, nullable=False)
 
     def __repr__(self):
         return f"Money(id={self.id!r},user_id={self.user_id!r},name={self.name!r},type={self.type!r},date={self.date!r}, amount={self.amount!r},category={self.category!r})"
@@ -60,9 +60,21 @@ class Predict(Base):
     real = Column(Float)
     date = Column(DateTime)
     
+class Category(Base):
+    __tablename__ = "category"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+
+def create_db():
+    
+    engine = initialize_db(echo=False)
+    delete_objects(engine)
+
+    engine = initialize_db(echo=False)
+    create_objects(engine)
+    
 metadata = sa.MetaData()
 engine = initialize_db(echo=False)
-
-create_objects(engine)
 SessionLocal.configure(bind=engine)
 metadata.reflect(bind=engine)

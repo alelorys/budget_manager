@@ -34,7 +34,7 @@ function addOperation(){
 
 function addUser(){
   const registerData = {
-    login: document.getElementById('login').value,
+    username: document.getElementById('login').value,
     name: document.getElementById('name').value,
     lastname: document.getElementById('lastname').value,
     password: document.getElementById('password').value

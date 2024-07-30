@@ -30,7 +30,7 @@
             <a href="/analise">Analiza</a>
             <a href="/operations/form">Operacje</a>
             <a href="/files">Pliki</a>
-            <a href="/budget" class="active">Budżet</a>
+            <a href="/budget/page" class="active">Budżet</a>
     
             
           </div>
@@ -80,6 +80,7 @@
     
         <div class="sidebar">
           <h4>Podsumowanie</h4>
+          {% if predict_response %}
           <div class="balance">
             <i class="bx bx-coin-stack icon"></i>
             <div class="info">
@@ -101,7 +102,29 @@
               <span>{{ predict_response.predicted - predict_response.real }} zł</span>
             </div>
           </div>
-    
+          {% else %}
+          <div class="balance">
+            <i class="bx bx-coin-stack icon"></i>
+            <div class="info">
+              <h5>Przewidywany</h5>
+              <span id="predicted">0,00 zł</span>
+            </div>
+          </div>
+          <div class="balance">
+            <i class="bx bxs-coin-stack icon"></i>
+            <div class="info">
+              <h5>Rzeczywisty</h5>
+              <span>0,00 zł</span>
+            </div>
+          </div>
+          <div class="balance">
+            <i class='bx bx-coin icon' ></i>
+            <div class="info">
+              <h5>Różnica</h5>
+              <span>0,00 zł</span>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
       <script>

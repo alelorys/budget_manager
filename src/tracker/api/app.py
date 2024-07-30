@@ -15,7 +15,7 @@ import uvicorn
 from tracker.db.utils import session_scope
 
 
-from tracker.api.routes import operations, services, budget
+from tracker.api.routes import operations, services, budget, categories
 from tracker.consts import Consts
 from tracker.db.db import Users as user_db
 from tracker.api.validators.services import MessageResponse
@@ -86,13 +86,14 @@ async def dashboard(request: Request):
 @app.post("/register")
 async def register(register: AddUser):
     with session_scope() as session:
-        user = session.query(user_db).filter(user_db.login==register.login).first()
+        user = session.query(user_db).filter(user_db.login==register.username).first()
+        
         if user:
             raise HTTPException(status_code=422, detail="User already exists!")
         
         try:
             new_user = user_db(
-                login = register.login,
+                login = register.username,
                 name = register.name,
                 lastname = register.lastname,
                 password = get_password_hash(register.password)
@@ -108,6 +109,7 @@ async def register(register: AddUser):
 app.include_router(services.route)
 app.include_router(operations.route)
 app.include_router(budget.route)
+app.include_router(categories.route)
 if __name__ == "__main__":
     uvicorn.run('app:app',
                 host='127.0.0.1',

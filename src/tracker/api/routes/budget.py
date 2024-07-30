@@ -43,7 +43,9 @@ async def page(request: Request):
     days = get_last_month()
 
     with session_scope() as session:
-        payments = session.query(Money).filter(Money.date.between(days[0],days[-1])).all()
+        payments = session.query(Money).filter(and_(
+            Money.user_id == user.id,
+            Money.date.between(days[0],days[-1]))).all()
         monthly_payments = []
         if payments:
             for payment in payments:
@@ -59,21 +61,27 @@ async def page(request: Request):
 
         predict_db:Predict = session.query(Predict).filter(Predict.user_id==user.id).first()
 
-        predict_response = valid_predict(
-            predicted=predict_db.predicted,
-            real=predict_db.real,
-            date=predict_db.date,
-            user_id=predict_db.user_id
-        )
+        if predict_db:
+            predict_response = valid_predict(
+                predicted=predict_db.predicted,
+                real=predict_db.real,
+                date=predict_db.date,
+                user_id=predict_db.user_id
+            )
 
-    return templates.TemplateResponse(name='budget.html', context={'request':request,
+            return templates.TemplateResponse(name='budget.html', context={'request':request,
                                                                    'token':token,
                                                                    'user_id':user.id,
                                                                    'login':user.username,
                                                                    'items':monthly_payments,
                                                                    'predict_response':predict_response},
                                       )
-
+        return templates.TemplateResponse(name='budget.html', context={'request':request,
+                                                                   'token':token,
+                                                                   'user_id':user.id,
+                                                                   'login':user.username,
+                                                                   'items':monthly_payments,
+                                                                   'predict_response':None})
 @route.post('/predict')
 async def predict(request: Request):
     token = request.cookies.get('Authorization').replace('Bearer ','')
