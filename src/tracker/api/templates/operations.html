@@ -30,6 +30,7 @@
             <a href="/operations/form" class="active">Operacje</a>
             <a href="/files">Pliki</a>
             <a href="/budget/page">Budżet</a>
+            <a href="/categories/list">Kategorie</a>
     
             
           </div>
@@ -44,7 +45,14 @@
             <label>Kwota</label><br>
             <input type='number' id='amount' name="amount"><br>
             <label>Kategoria</label><br>
-            <input type='text' id='category' name="category"><br>
+            <select name="category" id="category">
+              <option value="choose">-- wybierz kategorię --</option>
+              {% if categories %}
+                {% for cat in categories['categories'] %}
+                <option value=`{{ cat }}`>{{ cat }}</option>
+                {% endfor %}
+              {% endif %}
+            </select><br>
             <label>Wpłata</label><br>
             <input type="checkbox" id='type' name="type">
             <button type="submit" onclick="addOperation()">Zapisz</button>

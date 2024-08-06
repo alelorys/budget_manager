@@ -24,12 +24,12 @@
         <nav>
           <div class="side_navbar">
             <span>Menu</span>
-            <a href="/services/list" class="active">Historia</a>
+            <a href="/services/list" >Historia</a>
             <a href="/analise">Analiza</a>
             <a href="/operations/form">Operacje</a>
             <a href="/files">Pliki</a>
             <a href="/budget/page">Budżet</a>
-            <a href="/categories/list">Kategorie</a>
+            <a href="/categories/list" class="active">Kategorie</a>
     
             
           </div>
@@ -141,11 +141,10 @@
               fetch('http://127.0.0.1:2345/categories/delete',{
                 method: 'DELETE',
                 headers:{'Content-Type': 'application/json',
-                        'Authorization':`Bearer ${token}`,
                         'Accept':'*/*',
                         'Connection':'keep-alive',
                         'Accept-Encoding':'gzip, deflate, br'},
-                      body: JSON.stringify(formData)                    
+                      body: JSON.stringify(del_cat)                    
                     })
                     .then(response => response.json())
                     .then(data => console.log(data))
