@@ -4,9 +4,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import  StaticFiles
 from datetime import datetime
 from tracker.db.utils import session_scope
-from tracker.db.db import Money, Users
+from tracker.db.db import Money, Users, Category
 from tracker.api.valid_user import get_current_user
-from tracker.api.validators.services import MoneyAdd, MessageResponse, MoneyResponse
+from tracker.api.validators.services import MoneyAdd, MessageResponse, MoneyResponse, CategoryList
 from tracker.api.validators.login import User
 from tracker.consts import Consts
 
@@ -27,11 +27,18 @@ async def form(request: Request):
     token = token.replace("Bearer ","")
 
     user = await get_current_user(token)
+
+    with session_scope() as session:
+        categories = session.query(Category).all()
+
+        if categories:
+            cats = CategoryList(categories=[cat.name for cat in categories])
    
     return templates.TemplateResponse(name="operations.html", context={"request":request,
                                                                        "token":token,
                                                                        "user_id":user.id,
-                                                                       "login":user.username})
+                                                                       "login":user.username,
+                                                                       "categories": cats})
 
 @route.post("/add/")
 async def add(addItems: MoneyAdd):

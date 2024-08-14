@@ -41,3 +41,6 @@ class Total(BaseModel):
         
 class FileToPredict(BaseModel):
     path: str
+
+class CategoryList(BaseModel):
+    categories: List[str]

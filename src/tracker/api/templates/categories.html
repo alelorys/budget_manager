@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>Zarządzanie budżetem</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    </head>
+    <body>
+      <header class="header">
+        <div class="logo">
+          <a href="#">Budżet</a>
+        </div>
+    
+        <div class="header-icons">
+          <i class="fas fa-bell"></i>
+          <div class="account">
+            <h4>{{ login }}</h4>
+          </div>
+        </div>
+      </header>
+      <div class="container">
+        <nav>
+          <div class="side_navbar">
+            <span>Menu</span>
+            <a href="/services/list" >Historia</a>
+            <a href="/analise">Analiza</a>
+            <a href="/operations/form">Operacje</a>
+            <a href="/files">Pliki</a>
+            <a href="/budget/page">Budżet</a>
+            <a href="/categories/list" class="active">Kategorie</a>
+    
+            
+          </div>
+        </nav>
+    
+        <div class="main-body">
+          <h2>Dashboard</h2>
+          <div class="promo_card">
+            <h1>Zarządzaj swoim budżetem</h1>
+            <span>Łatwo, przejrzyście</span>
+            <button>Dowiedz sie więcej</button>
+          </div>
+          <div class="tab">
+            <button class="tablinks" onclick="openOption(event, 'Lista')">Lista</button>
+            <button class="tablinks" onclick="openOption(event, 'Dodaj')">Dodaj kategorię</button>
+          </div>
+          <div id='Lista' class="history_lists tabcontent">
+            <div class="categories">
+              <div class="row">
+                <h4>Lista kategorii</h4>
+              </div>
+              <table class="scrolldown" id="modify">
+                <thead>
+                  <tr>
+                    <th>Nazwa kategorii</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if not categories %}
+                  <tr>
+                    <td></td>
+                  </tr>
+                  {% else %}
+                    {% for cat in categories %}
+                    <tr>
+                      <td>{{ cat.name }} <span class="close" ><i class='bx bxs-edit edit'></i><i class='bx bx-trash trash' onclick="deleteCat('{{ cat.id }}')"></i></span></td>
+                    </tr>
+                    {% endfor %}
+                  {% endif %}
+                </tbody>
+              </table>
+
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const table = document.getElementById('modify');
+
+                  table.addEventListener('dbclick', function(event){
+                    const target = event.target;
+
+                    if (target.tagName === 'TD'){
+                      const originalContent = target.innerText;
+                      const input = document.createElement('input');
+                      input.type = 'text';
+                      input.value = originalContent;
+                      target.innerHTML = '';
+                      target.appendChild(input);
+                      target.focus();
+
+                      input.addEventListener('blur',()=>
+                    {
+                      target.innerText = input.value || originalContent;
+                    });
+
+                    input.addEventListener('keydown', (event) =>{
+                      if (event.key === 'Enter'){
+                        input.blur();
+                      } else if (event.key === 'Escape'){
+                        target.innerText = originalContent;
+                      }
+                    });
+                    }
+                  });
+                });
+              </script>
+            </div>
+          </div>
+
+          <div id='Dodaj' class="tabcontent">
+
+            <form >
+              <div class="form-row">
+                <div class="input-data">
+                  
+                  <input type="text" id="cat_name">
+                  <div class="underline"></div>
+                  <label for="">Nazwa kategorii</label>
+                </div>
+              </div>
+              <div class="form-row submit-btn">
+                <div class="input-data">
+                  <div class="inner"></div>
+                  <input type="submit" value="Dodaj" onclick="addCategory()">
+                </div>
+              </div>
+              </form>
+          </div>
+
+          <script>
+            function openOption(evt, option){
+              let i, tabcontent, tablinks;
+
+              tabcontent = document.getElementsByClassName('tabcontent');
+              for (i=0; i<tabcontent.length;i++){
+                tabcontent[i].style.display = 'none';
+              }
+
+              tablinks = document.getElementsByClassName('tablinks');
+              for (i=0;i<tablinks.length;i++){
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+              }
+
+              document.getElementById(option).style.display = 'block';
+              evt.currentTarget.className += " active";
+            };
+
+            function addCategory(){
+              const cat_data = {name: document.getElementById('cat_name').value};
+            
+
+            fetch('http://127.0.0.1:2345/categories/add',{
+              method:'POST',
+              headers:{
+                'Content-Type': 'application/json',
+                'Accept':'*/*',
+                'Connection':'keep-alive',
+                'Accept-Encoding':'gzip, deflate, br'
+    
+              },
+              body: JSON.stringify(cat_data)
+            })
+            .then(function(response){
+              if (response.status === 422){
+                alert("Kategoria już istnieje")
+              }
+              else if (response.status === 200){
+                alert("Dodano kategorię")
+              }
+            })};
+
+            function deleteCat(cat_id){
+              const del_cat = {id: cat_id};
+              fetch('http://127.0.0.1:2345/categories/delete',{
+                method: 'DELETE',
+                headers:{'Content-Type': 'application/json',
+                        'Accept':'*/*',
+                        'Connection':'keep-alive',
+                        'Accept-Encoding':'gzip, deflate, br'},
+                      body: JSON.stringify(del_cat)                    
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch((error) => {
+                      console.error('Error:', error)
+                    });
+            }
+            const delete_item = document.getElementsByClassName('close');
+            console.log(delete_item)
+            for (let i = 0; i < delete_item.length; i++){
+              delete_item[i].addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+              });
+            }
+          </script>
+        </div>    
+    
+        <div class="sidebar">
+          <h4>Podsumowanie</h4>
+          <div class="balance">
+            <i class="bx bx-coin-stack icon"></i>
+            <div class="info">
+              <h5>Przewidywany</h5>
+              {% if result %}
+              <span>{{ result }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="balance">
+            <i class="bx bxs-coin-stack icon"></i>
+            <div class="info">
+              <h5>Rzeczywisty</h5>
+              {% if balance %}
+              <span>{{ balance }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="balance">
+            <i class='bx bx-coin icon' ></i>
+            <div class="info">
+              <h5>Różnica</h5>
+              {% if difference %}
+              <span>{{ difference }} zł</span>
+              {% else %}
+              <span>0.00 zł</span>
+              {% endif %}
+            </div>
+          </div>
+    
+        </div>
+      </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', async function(){
+                const token = "{{ token }}";
+                if(!token){
+                    window.location.href = '/login_form';
+                    return;
+                }
+
+                const response = await fetch('http://127.0.0.1:2345/categories/list',{
+            method: 'GET',
+            headers:{
+              'Authorization': token
+            }
+          });
+
+          if (response.ok){
+            const data = await response.json();
+          } else {
+            console.error("Coś poszło nie tak", await response.json());
+          }
+        });
+        </script>
+    </body>
+</html>
