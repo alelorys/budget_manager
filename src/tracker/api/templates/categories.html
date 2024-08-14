@@ -51,7 +51,7 @@
               <div class="row">
                 <h4>Lista kategorii</h4>
               </div>
-              <table class="scrolldown">
+              <table class="scrolldown" id="modify">
                 <thead>
                   <tr>
                     <th>Nazwa kategorii</th>
@@ -65,12 +65,45 @@
                   {% else %}
                     {% for cat in categories %}
                     <tr>
-                      <td>{{ cat.name }} <span class="close" onclick="deleteCat('{{ cat.id }}')"><i class='bx bx-trash'></i></span></td>
+                      <td>{{ cat.name }} <span class="close" ><i class='bx bxs-edit edit'></i><i class='bx bx-trash trash' onclick="deleteCat('{{ cat.id }}')"></i></span></td>
                     </tr>
                     {% endfor %}
                   {% endif %}
                 </tbody>
               </table>
+
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const table = document.getElementById('modify');
+
+                  table.addEventListener('dbclick', function(event){
+                    const target = event.target;
+
+                    if (target.tagName === 'TD'){
+                      const originalContent = target.innerText;
+                      const input = document.createElement('input');
+                      input.type = 'text';
+                      input.value = originalContent;
+                      target.innerHTML = '';
+                      target.appendChild(input);
+                      target.focus();
+
+                      input.addEventListener('blur',()=>
+                    {
+                      target.innerText = input.value || originalContent;
+                    });
+
+                    input.addEventListener('keydown', (event) =>{
+                      if (event.key === 'Enter'){
+                        input.blur();
+                      } else if (event.key === 'Escape'){
+                        target.innerText = originalContent;
+                      }
+                    });
+                    }
+                  });
+                });
+              </script>
             </div>
           </div>
 
