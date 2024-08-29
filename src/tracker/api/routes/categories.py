@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from tracker.db.utils import session_scope
 from tracker.api.valid_user import get_current_user
-from tracker.api.validators.categories import CategoryList, AddCategory, DeleteCategory
+from tracker.api.validators.categories import CategoryList, AddCategory, DeleteCategory, EditCategory
 from tracker.db.db import Category
 from tracker.consts import Consts
 
@@ -61,6 +61,19 @@ async def add(add: AddCategory):
         session.commit()
 
         return 200
+
+@route.put('/edit')
+async def edit(edit_request:EditCategory):
+    with session_scope() as session:
+        print(edit_request)
+        category = session.query(Category).filter(Category.id == edit_request.id).first()
+
+        if not category:
+            raise HTTPException(status_code=422, detail='Not found')
+
+        category.name = edit_request.name
+    
+    return 200
 
 @route.delete('/delete')
 async def delete(delete:DeleteCategory):

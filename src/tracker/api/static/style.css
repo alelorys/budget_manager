@@ -460,25 +460,37 @@ form .form-row{
   }
 }
 
-tr{
-  padding: 0;
-  margin: 0;
+.categories_tbl{
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.categories_th{
+  border-bottom: 3px solid #fbeadc;
+}
+.categories_th, .categories_td{
+  text-align: center;
+  padding: 5px;
+  font-size: 15px;
+}
+
+.categories_th:first-child, .categories_td:first-child{
+  text-align: left;
 }
 
 
-
-.close{
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  right: 0%;
-  padding: 12px 16px;
-  transform: translate(0%, -50%);
-  text-align: left;
-  gap: 15px;
+.close, .edit{
+cursor: pointer;
+padding: 10px;
+border-radius: 15px;
 }
 
 .close:hover{
-  background: #ffcfc4;
+background: #ffcfc4;
+}
+
+.edit:hover{
+  background: #c4cfa8;
 }
 
