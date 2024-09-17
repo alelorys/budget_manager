@@ -33,10 +33,9 @@
                     },
                     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
                 })
-                .then(response => response.json())
                 .then(data => {
                     localStorage.setItem('token', data.access_token)
-                    window.location.href = 'http://127.0.0.1:2345/dashboard';
+                    window.location.href = `http://127.0.0.1:2345/dashboard`;
                 })
                 .catch(error => console.error('Error: ', error));
                 

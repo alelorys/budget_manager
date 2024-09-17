@@ -15,7 +15,12 @@ import uvicorn
 from tracker.db.utils import session_scope
 
 
-from tracker.api.routes import operations, services, budget, categories
+from tracker.api.routes import (
+    operations, 
+    services, 
+    budget, 
+    categories,
+    profile)
 from tracker.consts import Consts
 from tracker.db.db import Users as user_db
 from tracker.api.validators.services import MessageResponse
@@ -68,7 +73,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         token = Token(access_token=access_token, token_type="bearer")
-        response = RedirectResponse(url=f'http://127.0.0.1:2345/dashboard', status_code=status.HTTP_303_SEE_OTHER)
+        response = RedirectResponse(url=f'http://127.0.0.1:2345/dashboard?token={token.access_token}', status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="Authorization", value=f"Bearer {token.access_token}")
         
     return response
@@ -110,6 +115,7 @@ app.include_router(services.route)
 app.include_router(operations.route)
 app.include_router(budget.route)
 app.include_router(categories.route)
+app.include_router(profile.route)
 if __name__ == "__main__":
     uvicorn.run('app:app',
                 host='127.0.0.1',

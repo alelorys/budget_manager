@@ -220,31 +220,23 @@ table.scrolldown{
   border-spacing: 0;
 }
 
-table.scrolldown thead,
-table.scrolldown tbody{
+table.scrolldown,
+table.scrolldown {
   display: block;
 }
 
-thead tr th{
+tr th{
   height: 40px;
   line-height: 20px;
   text-align: center;
 }
 
-table.scrolldown tbody{
+table.scrolldown {
   height: 150px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 
-tbody{
-border-top: 1px solid #DDDDBD;
-}
-
-tbody td,
-tbody th{
-  width: 100%;
-}
 
 td, th, tr{
   text-align: center;

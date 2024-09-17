@@ -18,7 +18,7 @@
         <div class="header-icons">
           <i class="fas fa-bell"></i>
           <div class="account">
-            <h4>{{ login }}</h4>
+            <h4><a href="/profile/page">{{ login }}</a></h4>
           </div>
         </div>
       </header>
@@ -43,16 +43,13 @@
           <div class="row">
             
           <table class="scrolldown">
-            <thead>
-              <tr>
+            <tr>
               <th>Nazwa</th>
               <th>Kategoria</th>
               <th>Kwota</th>
               <th>Typ</th>
               <th>Data</th>
             </tr>
-          </thead>
-          <tbody>
             {% if items is none %}
               <tr>
                 <td></td>
@@ -73,7 +70,6 @@
               {% endfor %}
             {% endif %}
             
-          </tbody>
           </table>
         </div>
         </div>
@@ -130,7 +126,7 @@
       <script>
         
         function predict(){
-          const token = "{{ token }}"
+          const token = "{{ token }}";
           fetch('http://127.0.0.1:2345/budget/predict',{
             method: 'POST',
             headers:{

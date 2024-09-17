@@ -68,7 +68,6 @@ async def page(request: Request):
                 date=predict_db.date,
                 user_id=predict_db.user_id
             )
-
             return templates.TemplateResponse(name='budget.html', context={'request':request,
                                                                    'token':token,
                                                                    'user_id':user.id,
@@ -101,7 +100,7 @@ async def predict(request: Request):
         
         total = sum([pay.amount for pay in payments if pay.type == 'true'])-sum([pay.amount for pay in payments if pay.type == 'false'])
 
-
+        
         predicted = Predict(
             predicted= round(result[0],2),
             real= total,
@@ -110,7 +109,11 @@ async def predict(request: Request):
         )
         session.add(predicted)
 
-    return 200
+        return templates.TemplateResponse(name='budget.html', context={'request':request,
+                                                                   'token':token,
+                                                                   'user_id':user.id,
+                                                                   'login':user.username,
+                                                                   'predict_response':predicted})
 
 @route.get('/month_check')
 async def month_check(request:Request):
