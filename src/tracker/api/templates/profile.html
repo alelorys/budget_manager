@@ -64,14 +64,14 @@
                     alert('hasła muszą być różne')
                 };
                 
-                fetch(`http://127.0.0.1:2345/profile/set_pwd?token=${token}`,{
+                fetch(`http://127.0.0.1:2345/profile/set_pwd`,{
                         method:'PUT',
                         headers:{
                             'Content-Type': 'application/json',
                             'Accept':'*/*',
                             'Connection':'keep-alive',
                             'Accept-Encoding':'gzip, deflate, br',
-                            'Authorization': token
+                            'Authorization': `Bearer ${token}`
                         },
                         body:JSON.stringify({'new_pwd':new_pwd})
                     }).then(function(response){

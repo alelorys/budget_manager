@@ -53,13 +53,13 @@ async def page(request: Request):
                     id=payment.id,
                     user_id=payment.user_id,
                 name=payment.name,
-                type='wpłata' if payment.type is True else 'wydatek',
+                type='wpłata' if payment.type == 'true' else 'wydatek',
                 date=payment.date,
                 amount=payment.amount,
                 category=payment.category
                 ))
 
-        predict_db:Predict = session.query(Predict).filter(Predict.user_id==user.id).first()
+        predict_db:Predict = session.query(Predict).filter(Predict.user_id==user.id).all()[-1]
 
         if predict_db:
             predict_response = valid_predict(

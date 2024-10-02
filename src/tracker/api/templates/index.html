@@ -113,7 +113,7 @@
             const response = await fetch('http://127.0.0.1:2345/services/list',{
               method: "GET",
               headers:{
-                'Authorization': token,
+                'Authorization': `Bearer ${token}`,
               },
             });
 

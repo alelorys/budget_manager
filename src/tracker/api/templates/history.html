@@ -58,7 +58,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% if items is none %}
+                {% if payments_list is none %}
                   <tr>
                     <td></td>
                     <td></td>
@@ -67,7 +67,7 @@
                     <td></td>
                   </tr>
                 {% else %}
-                  {% for item in items %}
+                  {% for item in payments_list %}
                   <tr>
                     <td>{{item.name}}</td>
                     <td>{{item.category}}</td>
@@ -95,11 +95,23 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% if predicted_list is none %}
                   <tr>
-                    <td>Marzec</td>
-                    <td>3500 zł</td>
-                    <td>3650 zł</td>
-                  </tr> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                {% else %}
+                  {% for item in predicted_list %}
+                  <tr>
+                    <td>{{item.predicted}}</td>
+                    <td>{{item.real}}</td>
+                    <td>{{item.month}}</td>
+                  </tr>
+                  {% endfor %}
+                {% endif %}
                 </tbody>
               </table>
             </div>

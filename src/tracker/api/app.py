@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from urllib import response
+import logging
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -34,6 +35,7 @@ from tracker.api.validators.login import (
 from tracker.api.valid_user import authenticate_user, create_access_token, get_password_hash, get_current_user
 from tracker.api.valid_user import ACCESS_TOKEN_EXPIRE_MINUTES
 
+logging.basicConfig(level=logging.INFO)
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
@@ -73,16 +75,15 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         token = Token(access_token=access_token, token_type="bearer")
-        response = RedirectResponse(url=f'http://127.0.0.1:2345/dashboard?token={token.access_token}', status_code=status.HTTP_303_SEE_OTHER)
+        response = RedirectResponse(url=f'http://127.0.0.1:2345/dashboard', status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="Authorization", value=f"Bearer {token.access_token}")
-        
-    return response
+        logging.info(token)
+        return response
     
 @app.get("/dashboard")
 async def dashboard(request: Request):
     token = request.cookies.get("Authorization")
     user = await get_current_user(token.replace("Bearer ",""))
-
     return templates.TemplateResponse("index.html", context={
         "request":request,
         "login":user.username,

@@ -1,13 +1,19 @@
+import logging
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from tracker.db.db import Money
+from tracker.db.db import Money, Predict
 from tracker.db.utils import session_scope
 from tracker.api.valid_user import get_current_user
-from tracker.api.validators.services import MoneyResponse,  MoneyList, Total, FileToPredict
+from tracker.api.validators.services import (
+    MoneyResponse,  
+    MoneyList,
+    PredictResponse)
 from tracker.consts import Consts
 
+logging.basicConfig(level=logging.INFO)
 route = APIRouter(
     prefix='/services',
     tags=['services'],
@@ -25,25 +31,35 @@ async def show_all(request: Request):
     
     with session_scope() as session:
         payments = session.query(Money).filter(Money.user_id==user.id).all()
+        predicted = session.query(Predict).filter(Predict.user_id==user.id).all()
         
-        
-        infos = []
+        payments_list, predicted_list = [],[]
         if payments:
             for payment in payments:
-                infos.append(MoneyResponse(
+                payments_list.append(MoneyResponse(
                     id=payment.id,
                     user_id=payment.user_id,
                 name=payment.name,
-                type='wpłata' if payment.type is True else 'wydatek',
+                type='wpłata' if payment.type == 'true' else 'wydatek',
                 date=payment.date,
                 amount=payment.amount,
                 category=payment.category
                 ))
-                
+        if predicted:
+            for predict in predicted:
+                date:datetime = predict.date
+                predicted_list.append(PredictResponse(
+                    id=predict.id,
+                    user_id=predict.user_id,
+                    predicted=predict.predicted,
+                    real=predict.real,
+                    month=date.strftime("%B")
+                ))       
             
         return templates.TemplateResponse('history.html', context={
             "request":request,
-            "items":infos,
+            "payments_list":payments_list,
+            "predicted_list":predicted_list,
             "token":token,
             "login": user.username
         })
@@ -67,22 +83,4 @@ async def show_detail(id:int, token: str = Depends(oauth2_scheme)):
         )
         return info
     
-@route.get('/total', response_model=Total)
-async def total(token:str = Depends(oauth2_scheme)):
-    await get_current_user(token)
-    with session_scope() as session:
-        
-        income = 0.0
-        outcome = 0.0
-        payments =session.query(Money).all()
-        
-        if not payments:
-            raise HTTPException(status_code=422, detail="Not found")
-        
-        for payment in payments:
-            if payment.type_operation == True:
-                income += payment.amount
-            if payment.type_operation == False:
-                outcome += payment.amount
-        total_amount = income - outcome
-    return Total(total=total_amount)
+

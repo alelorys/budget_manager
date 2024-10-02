@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
@@ -10,6 +11,7 @@ from tracker.api.validators.profile import SetPassword
 
 from tracker.consts import Consts
 
+logging.basicConfig(level=logging.INFO)
 route = APIRouter(
     prefix='/profile',
     tags=['profile'],
@@ -33,7 +35,8 @@ async def page(request:Request):
 
 @route.put("/set_pwd")
 async def set_pwd(request:Request, pwd_request:SetPassword):
-    token = request.cookies.get('Authorization').replace('Barear ','')
+    token = request.cookies.get('Authorization').replace('Bearer ','')
+    logging.info(token)
     user = await get_current_user(token)
 
     with session_scope() as session:
