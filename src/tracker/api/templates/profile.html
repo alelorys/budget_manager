@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="stylesheet" href="/static/profile.css">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    </head>
+    <body>
+        <div class="side">
+            <p>{{ login }}</p>
+                <button class="tabs"
+                onclick="openOption(event, 'Hasło')" id="defaultOpen">Zmiana hasła</button>
+                <button class="tabs"
+                onclick="openOption(event, 'Email')">Ustaw email</button>
+            <a href="/dashboard">Powrót</a>
+        </div>
+        <div class="profile">
+            <div id='Hasło' class="tabcon">
+                <h3>Zmiana hasła</h3>
+                <form class="new_password_form">
+                    <label>Stare hasło</label>
+                    <input type="password" id="old_password" placeholder="stare hasło">
+                    <label>Nowe hasło</label>
+                    <input type="password" id="new_password" placeholder="nowe hasło">
+                    <input type="submit" onclick="setNewPassword()" value="Ustaw hasło" class="btn">
+                </form>
+                <p id="msg"></p>
+            </div>
+            <div id="Email" class="tabcon">
+                <h3>Ustaw email</h3>
+                <form class="email_form">
+                    <label>Podaj adres email</label>
+                    <input type="text" placeholder="email" id="email">
+                    <input type="button" value="Zapisz" onclick="setEmail()" class="btn">
+                </form>
+            </div>
+        </div>
+        <script>
+            function openOption(evt, pageName){
+                var i, tabcon, tabs;
+                tabcon = document.getElementsByClassName('tabcon');
+                for (i = 0; i < tabcon.length; i++) {
+                    tabcon[i].style.display = "none";
+                }
+                tabs = document.getElementsByClassName("tabs");
+                for (i = 0; i < tabs.length; i++) {
+                    tabs[i].className = tabs[i].className.replace(" active", "");
+                }
+                document.getElementById(pageName).style.display = "block";
+                evt.currentTarget.className += " active";
+                }
+
+                // Get the element with id="defaultOpen" and click on it
+                document.getElementById("defaultOpen").click();
+
+            function setNewPassword(){
+                var old_pwd = document.getElementById('old_password').value;
+                var new_pwd = document.getElementById('new_password').value;
+                
+                const token = "{{ token }}";
+                console.log(token);
+                if (old_pwd == new_pwd){
+                    alert('hasła muszą być różne')
+                };
+                
+                fetch(`http://127.0.0.1:2345/profile/set_pwd`,{
+                        method:'PUT',
+                        headers:{
+                            'Content-Type': 'application/json',
+                            'Accept':'*/*',
+                            'Connection':'keep-alive',
+                            'Accept-Encoding':'gzip, deflate, br',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body:JSON.stringify({'new_pwd':new_pwd})
+                    }).then(function(response){
+                        if (response.status === 200){
+                            alert("Hasło zmienione");
+                        }else{
+                            alert("Wystąpił błąd");
+                        }
+                    })
+                
+            }
+        </script>
+    </body>
+</html>

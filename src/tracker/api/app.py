@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from urllib import response
+import logging
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -15,7 +16,13 @@ import uvicorn
 from tracker.db.utils import session_scope
 
 
-from tracker.api.routes import operations, services, budget, categories
+from tracker.api.routes import (
+    operations, 
+    services, 
+    budget, 
+    categories,
+    profile,
+    analitics)
 from tracker.consts import Consts
 from tracker.db.db import Users as user_db
 from tracker.api.validators.services import MessageResponse
@@ -29,6 +36,7 @@ from tracker.api.validators.login import (
 from tracker.api.valid_user import authenticate_user, create_access_token, get_password_hash, get_current_user
 from tracker.api.valid_user import ACCESS_TOKEN_EXPIRE_MINUTES
 
+logging.basicConfig(level=logging.INFO)
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
@@ -70,14 +78,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
         token = Token(access_token=access_token, token_type="bearer")
         response = RedirectResponse(url=f'http://127.0.0.1:2345/dashboard', status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="Authorization", value=f"Bearer {token.access_token}")
-        
-    return response
+        logging.info(token)
+        return response
     
 @app.get("/dashboard")
 async def dashboard(request: Request):
     token = request.cookies.get("Authorization")
     user = await get_current_user(token.replace("Bearer ",""))
-
     return templates.TemplateResponse("index.html", context={
         "request":request,
         "login":user.username,
@@ -110,6 +117,8 @@ app.include_router(services.route)
 app.include_router(operations.route)
 app.include_router(budget.route)
 app.include_router(categories.route)
+app.include_router(profile.route)
+app.include_router(analitics.route)
 if __name__ == "__main__":
     uvicorn.run('app:app',
                 host='127.0.0.1',

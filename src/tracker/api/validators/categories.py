@@ -3,6 +3,9 @@ from pydantic import BaseModel
 class AddCategory(BaseModel):
     name: str
 
+class EditCategory(BaseModel):
+    id: int
+    name: str
 class CategoryList(BaseModel):
     id: int
     name: str

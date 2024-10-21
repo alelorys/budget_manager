@@ -7,7 +7,7 @@
       <!-- Font Awesome Cdn Link -->
       <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
     </head>
-    <body onload="getData();">
+    <body>
       
       <header class="header">
         <div class="logo">
@@ -17,7 +17,7 @@
         <div class="header-icons">
           <i class="fas fa-bell"></i>
           <div class="account">
-            <h4>{{ login }}</h4>
+            <h4><a href="/profile/page">{{ login }}</a></h4>
           </div>
         </div>
       </header>
@@ -113,7 +113,7 @@
             const response = await fetch('http://127.0.0.1:2345/services/list',{
               method: "GET",
               headers:{
-                'Authorization': token,
+                'Authorization': `Bearer ${token}`,
               },
             });
 

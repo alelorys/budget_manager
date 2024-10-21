@@ -16,7 +16,7 @@
         <div class="header-icons">
           <i class="fas fa-bell"></i>
           <div class="account">
-            <h4>{{ login }}</h4>
+            <h4><a href="/profile/page">{{ login }}</a></h4>
           </div>
         </div>
       </header>
@@ -52,12 +52,13 @@
                 <h4>Lista kategorii</h4>
               </div>
               <table class="scrolldown" id="modify">
-                <thead>
-                  <tr>
-                    <th>Nazwa kategorii</th>
-                  </tr>
-                </thead>
-                <tbody>
+                
+                <tr>
+                  <th class="categories_th">Nazwa kategorii</th>
+                  <th class="categories_th">Edycja</th>
+                  <th class="categories_th">Usunięcie</th>
+                </tr>
+                
                   {% if not categories %}
                   <tr>
                     <td></td>
@@ -65,45 +66,14 @@
                   {% else %}
                     {% for cat in categories %}
                     <tr>
-                      <td>{{ cat.name }} <span class="close" ><i class='bx bxs-edit edit'></i><i class='bx bx-trash trash' onclick="deleteCat('{{ cat.id }}')"></i></span></td>
+                      <td class="categories_td">{{ cat.name }} </td>
+                        <td class="categories_td"><i class='bx bxs-edit edit' onclick="editCat(this,'{{ cat.id }}')"></i></td>
+                        <td class="categories_td"><i class='bx bx-trash close' onclick="deleteCat('{{ cat.id }}')"></i></td>
                     </tr>
                     {% endfor %}
                   {% endif %}
-                </tbody>
               </table>
 
-              <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                  const table = document.getElementById('modify');
-
-                  table.addEventListener('dbclick', function(event){
-                    const target = event.target;
-
-                    if (target.tagName === 'TD'){
-                      const originalContent = target.innerText;
-                      const input = document.createElement('input');
-                      input.type = 'text';
-                      input.value = originalContent;
-                      target.innerHTML = '';
-                      target.appendChild(input);
-                      target.focus();
-
-                      input.addEventListener('blur',()=>
-                    {
-                      target.innerText = input.value || originalContent;
-                    });
-
-                    input.addEventListener('keydown', (event) =>{
-                      if (event.key === 'Enter'){
-                        input.blur();
-                      } else if (event.key === 'Escape'){
-                        target.innerText = originalContent;
-                      }
-                    });
-                    }
-                  });
-                });
-              </script>
             </div>
           </div>
 
@@ -168,7 +138,61 @@
                 alert("Dodano kategorię")
               }
             })};
+            
+            function editCat(i, cat_id){
+                  var row = i.parentNode.parentNode;
 
+                  
+                    var cell = row.cells[0];
+                    var cellText = cell.innerText;
+
+                    var input = document.createElement("input");
+                    input.type = "text";
+                    input.value = cellText;
+
+                    cell.innerText = "";
+                    cell.appendChild(input);
+                  
+
+                  
+                  i.setAttribute("onclick", `saveRow(this, ${cat_id})`);
+                }
+
+                function saveRow(i, cat_id){
+                  var row = i.parentNode.parentNode;
+    
+                  // Przechodzimy przez każdą komórkę wiersza (oprócz ostatniej z przyciskiem)
+                  
+                      var cell = row.cells[0];
+                      var input = cell.querySelector("input[type='text']");
+                      
+                      // Pobieramy wartość z input i zamieniamy go z powrotem na tekst
+                      if (input) {
+                          var newText = input.value;
+                          cell.innerHTML = newText;
+
+                          fetch('http://127.0.0.1:2345/categories/edit',{
+                            method:'PUT',
+                            headers:{'Content-Type': 'application/json',
+                                    'Accept':'*/*',
+                                    'Connection':'keep-alive',
+                                    'Accept-Encoding':'gzip, deflate, br'},
+                            body:JSON.stringify({id:cat_id,name:newText})
+                                      },
+                                    )
+                                    .then(response => response.json())
+                                    .then(data => console.log(data))
+                                    .catch((error) => {
+                                      console.error('Error:', error)
+                                    });
+                      }
+                  
+    
+                  // Zmieniamy przycisk "Save" z powrotem na "Edit"
+                  
+                  i.setAttribute("onclick", `editRow(this, ${cat_id})`);
+                              }
+            
             function deleteCat(cat_id){
               const del_cat = {id: cat_id};
               fetch('http://127.0.0.1:2345/categories/delete',{

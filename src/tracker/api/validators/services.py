@@ -30,14 +30,16 @@ class MoneyResponse(BaseModel):
     class Config:
         orm_mode = True
         
+class PredictResponse(BaseModel):
+    id: int
+    user_id:int
+    predicted: float
+    real: float
+    month: str
 class MoneyList(BaseModel):
     operations: List[MoneyResponse]
+    predicted: List[PredictResponse]
     
-class Total(BaseModel):
-    total: float
-    
-    class Config:
-        orm_mode = True
         
 class FileToPredict(BaseModel):
     path: str

@@ -32,13 +32,10 @@
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+                }).then(response => response.json())
+                .then((data)=> {
+                    window.location.href = 'http://127.0.0.1:2345/dashboard'
                 })
-                .then(response => response.json())
-                .then(data => {
-                    localStorage.setItem('token', data.access_token)
-                    window.location.href = 'http://127.0.0.1:2345/dashboard';
-                })
-                .catch(error => console.error('Error: ', error));
                 
                /* const data = await response.json();
                 if (response.ok){
