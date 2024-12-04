@@ -51,8 +51,8 @@ async def show_all(request: Request):
                 predicted_list.append(PredictResponse(
                     id=predict.id,
                     user_id=predict.user_id,
-                    predicted=predict.predicted,
-                    real=predict.real,
+                    predicted=round(predict.predicted, 2),
+                    real=round(predict.real, 2),
                     month=date.strftime("%B")
                 ))       
             

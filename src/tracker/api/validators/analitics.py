@@ -13,3 +13,10 @@ class ByCategoryList(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ByPrediction(BaseModel):
+    predicted: float
+    real: float
+
+class ByPredictionList(BaseModel):
+    pred_analitic: List[ByPrediction] = None
