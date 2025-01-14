@@ -48,7 +48,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+"""
+TODO:
+- route for csv files hundels: dump in, insert into db, delete file
+- route for models: choose model, delete, train new one
+- rebrand route for budget
+- route for analitics: finally
+- login and registration forms: login rigth after to dashboard without double click
+"""
 templates = Jinja2Templates(directory=Consts.TEMPLATES_PATH)
 app.mount("/static", StaticFiles(directory=Consts.STATIC_PATH), name="static")
 
@@ -84,7 +91,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
 @app.get("/dashboard")
 async def dashboard(request: Request):
     token = request.cookies.get("Authorization")
-    user = await get_current_user(token.replace("Bearer ",""))
+    user = await get_current_user(token.replace('Bearer ',''))
     return templates.TemplateResponse("index.html", context={
         "request":request,
         "login":user.username,

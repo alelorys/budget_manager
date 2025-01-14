@@ -79,21 +79,21 @@
           <div class="balance">
             <i class="bx bx-coin-stack icon"></i>
             <div class="info">
-              <h5>Przewidywany</h5>
+              <h5>Wpływy</h5>
               <span>{{ 0.00 or result }} zł</span>
             </div>
           </div>
           <div class="balance">
             <i class="bx bxs-coin-stack icon"></i>
             <div class="info">
-              <h5>Rzeczywisty</h5>
+              <h5>Wydatki</h5>
               <span>3650 zł</span>
             </div>
           </div>
           <div class="balance">
             <i class='bx bx-coin icon' ></i>
             <div class="info">
-              <h5>Różnica</h5>
+              <h5>Saldo</h5>
               <span>150 zł</span>
             </div>
           </div>
@@ -110,7 +110,7 @@
               console.error("No token found");
               return;
             }
-
+            
             const response = await fetch('http://127.0.0.1:2345/services/list',{
               method: "GET",
               headers:{

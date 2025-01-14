@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from sqlalchemy import func, and_
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
@@ -54,12 +55,22 @@ async def show_all(request: Request):
                     predicted=round(predict.predicted, 2),
                     real=round(predict.real, 2),
                     month=date.strftime("%B")
-                ))       
-            
+                ))  
+
+        summary = {}
+        income = session.query(func.sum(Money.amount)).filter(and_(Money.user_id==user.id,Money.type=='true')).all()[0][0]
+        outcome = session.query(func.sum(Money.amount)).filter(and_(Money.user_id==user.id,Money.type=='false')).all()[0][0]
+        print("wpływ:",income)
+        print("wydatki:",outcome)
+        saldo = income - outcome    
+        summary.update({'income':income,
+                        'outcome':outcome,
+                        'saldo':saldo})
         return templates.TemplateResponse('history.html', context={
             "request":request,
             "payments_list":payments_list,
             "predicted_list":predicted_list,
+            "summary":summary,
             "token":token,
             "login": user.username
         })
