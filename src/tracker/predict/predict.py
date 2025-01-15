@@ -2,6 +2,7 @@ import os
 import calendar
 import pandas as pd
 import numpy as np
+import logging
 
 from typing import Union, List
 
@@ -15,6 +16,7 @@ from tracker.db.utils import session_scope
 from tracker.db.db import Money
 from tracker.consts import Consts
 
+logging.basicConfig(level=logging.DEBUG)
 
 def get_data_from_file(path):
     if os.path.exists(path):
@@ -26,7 +28,7 @@ def get_data_from_file(path):
             
 
 def train_model(user_id):
-    
+    #TODO save model and/or rewrite it
     data:pd.DataFrame = pd.DataFrame.from_dict(get_categories_from_db(user_id=user_id)[0], orient='columns')
     data = data.fillna(0)
     Y = data['Suma']
@@ -40,18 +42,23 @@ def train_model(user_id):
 
     return regressor
 
-def get_last_month():
+def get_last_month(): #TODO move out to one place
     year = datetime.now().year
     month = datetime.now().month
-    month -= 1
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1 
 
+    logging.info(f'month {month} and year {year}')
     num_days = calendar.monthrange(year, month)[1]
     days = [date(year,month, day) for day in range(1,num_days+1)]
 
     return days, month
 
 def get_categories_from_db(user_id):
-
+    #TODO save all data to csv file and train model from it
     days,month = get_last_month()
     data, categories_list = get_data_from_file(Consts.CSV_FILE)
     categories_dict = {}
@@ -81,7 +88,7 @@ def get_categories_from_db(user_id):
     
     return data, df
 
-def predict(user_id:int):
+def predict(user_id:int):#TODO remove as is not in use
     model = train_model(user_id)
     df:pd.DataFrame = get_categories_from_db(user_id)[1]
     df.drop(columns=['Suma'], inplace=True)

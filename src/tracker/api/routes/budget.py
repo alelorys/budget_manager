@@ -29,7 +29,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 def get_last_month():
     year = datetime.now().year
     month = datetime.now().month
-    month -= 1
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1 
     num_days = calendar.monthrange(year, month)[1]
     days = [date(year,month, day) for day in range(1,num_days+1)]
 
@@ -41,7 +45,7 @@ async def page(request: Request):
     user = await get_current_user(token)
 
     days = get_last_month()
-
+    print(days)
     with session_scope() as session:
         payments = session.query(Money).filter(and_(
             Money.user_id == user.id,
@@ -63,8 +67,8 @@ async def page(request: Request):
 
         if predict_db:
             predict_response = valid_predict(
-                predicted=predict_db.predicted,
-                real=predict_db.real,
+                predicted=round(predict_db.predicted, 2),
+                real=round(predict_db.real),
                 date=predict_db.date,
                 user_id=predict_db.user_id
             )
@@ -103,7 +107,7 @@ async def predict(request: Request):
         
         predicted = Predict(
             predicted= round(result[0],2),
-            real= total,
+            real= round(total, 2),
             date=datetime.now(),
             user_id= user.id
         )

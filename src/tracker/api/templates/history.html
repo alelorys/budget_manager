@@ -106,9 +106,9 @@
                 {% else %}
                   {% for item in predicted_list %}
                   <tr>
+                    <td>{{item.month}}</td>
                     <td>{{item.predicted}}</td>
                     <td>{{item.real}}</td>
-                    <td>{{item.month}}</td>
                   </tr>
                   {% endfor %}
                 {% endif %}
@@ -123,9 +123,9 @@
           <div class="balance">
             <i class="bx bx-coin-stack icon"></i>
             <div class="info">
-              <h5>Przewidywany</h5>
-              {% if result %}
-              <span>{{ result }} zł</span>
+              <h5>Wpłaty</h5>
+              {% if summary.income %}
+              <span>{{ summary.income }} zł</span>
               {% else %}
               <span>0.00 zł</span>
               {% endif %}
@@ -134,9 +134,9 @@
           <div class="balance">
             <i class="bx bxs-coin-stack icon"></i>
             <div class="info">
-              <h5>Rzeczywisty</h5>
-              {% if balance %}
-              <span>{{ balance }} zł</span>
+              <h5>Wydatki</h5>
+              {% if summary.outcome %}
+              <span>{{ summary.outcome }} zł</span>
               {% else %}
               <span>0.00 zł</span>
               {% endif %}
@@ -145,9 +145,9 @@
           <div class="balance">
             <i class='bx bx-coin icon' ></i>
             <div class="info">
-              <h5>Różnica</h5>
-              {% if difference %}
-              <span>{{ difference }} zł</span>
+              <h5>Saldo</h5>
+              {% if summary.saldo %}
+              <span>{{ summary.saldo }} zł</span>
               {% else %}
               <span>0.00 zł</span>
               {% endif %}
