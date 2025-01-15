@@ -34,3 +34,17 @@ class ByPrediction(BaseModel):
 
 class ByPredictionList(BaseModel):
     pred_analitic: List[ByPrediction] = None
+
+class GetSummary(GetDate):
+    user_id: int
+class SummaryDetail(BaseModel):
+    year: str
+    income: float = 0.0
+    outcome: float = 0.0
+    saldo: float = 0.0
+
+class SummaryList(BaseModel):
+    summary: List[SummaryDetail]
+
+    class Config:
+        orm_mode = True

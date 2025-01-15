@@ -12,7 +12,10 @@ from tracker.api.validators.analitics import (
     ByCategoryList, 
     GetPrediction,
     ByPrediction, 
-    ByPredictionList)
+    ByPredictionList,
+    SummaryDetail,
+    SummaryList,
+    GetSummary)
 from tracker.api.valid_user import get_current_user
 from tracker.db.utils import session_scope
 from tracker.db.db import Money, Predict
@@ -107,8 +110,42 @@ async def by_predictions(request:GetPrediction, token:str=Depends(oauth2_scheme)
         return ByPredictionList(pred_analitic=by_predict_real_list)
 
 @route.get("/summary")
-async def summary(request,token:str = Depends(oauth2_scheme)):
+async def summary(request:GetSummary,token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        pass
+        filters = []
+
+        filters.append(Money.user_id==request.user_id)
+        if request.date_from:
+            filters.append(Money.date>=request.date_from)
+        if request.date_to:
+            filters.append(Money.date<=request.date_to)
+            date = request.date_to.strftime("%Y")
+        else:
+            filters.append(Money.date<=datetime.now())
+            date = datetime.now().year
+        
+        income_query = session.query(func.sum(Money.amount))\
+        .filter(Money.type=="true").filter(and_(*filters))\
+        .all()[0][0]
+
+        outcome_query = session.query(func.sum(Money.amount))\
+        .filter(Money.type == 'false').filter(and_(*filters))\
+        .all()[0][0]
+
+        saldo = income_query - outcome_query
+        
+        detail = SummaryDetail(
+            year=str(date),
+            income=income_query,
+            outcome=outcome_query,
+            saldo=saldo
+                        )
+            
+        response = SummaryList(
+            summary=[detail]
+        )
+    
+    return response
+        
