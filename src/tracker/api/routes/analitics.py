@@ -10,6 +10,7 @@ from tracker.api.validators.analitics import (
     ByCategories, 
     GetCategories,
     ByCategoryList, 
+    GetPrediction,
     ByPrediction, 
     ByPredictionList)
 from tracker.api.valid_user import get_current_user
@@ -77,20 +78,37 @@ async def by_categories_all(request:GetCategories,token:str=Depends(oauth2_schem
         return ByCategoryList(cat_analytic=by_category_list)
 
 @route.get('/by_predictions')
-async def by_predictions(request:Request, token:str=Depends(oauth2_scheme)):
+async def by_predictions(request:GetPrediction, token:str=Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        predict_real = session.query(func.sum(Predict.predicted), func.sum(Predict.real))\
-        .filter(Predict.user_id==user.id)\
-            .group_by(Predict.real).all()
-        
+        filters = []
+
+        filters.append(Predict.user_id==request.user_id)
+        if request.date_from:
+            filters.append(Predict.date>=request.date_from)
+        if request.date_to:
+            filters.append(Predict.date<=request.date_to)
+        else:
+            filters.append(Predict.date<=datetime.now())
+
+        query = session.query(Predict.date,func.sum(Predict.predicted),func.sum(Predict.real)).filter(and_(*filters))
+        result = query.group_by(Predict.date).all()
         by_predict_real_list = []
 
-        if predict_real:
-            for row in predict_real:
+        if result:
+            for row in result:
+                date:datetime = row[0]
                 by_predict_real_list.append(ByPrediction(
-                    predicted=row[0],
-                    real=row[1]
+                    month= date.strftime("%B"),
+                    predicted=row[1],
+                    real=row[2]
                 ))
         return ByPredictionList(pred_analitic=by_predict_real_list)
+
+@route.get("/summary")
+async def summary(request,token:str = Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        pass
