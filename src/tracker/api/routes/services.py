@@ -63,9 +63,9 @@ async def show_all(request: Request):
         print("wpływ:",income)
         print("wydatki:",outcome)
         saldo = income - outcome    
-        summary.update({'income':income,
-                        'outcome':outcome,
-                        'saldo':saldo})
+        summary.update({'income':round(income,2),
+                        'outcome':round(outcome,2),
+                        'saldo':round(saldo,2)})
         return templates.TemplateResponse('history.html', context={
             "request":request,
             "payments_list":payments_list,

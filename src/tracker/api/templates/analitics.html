@@ -43,8 +43,56 @@
             <span>Łatwo, przejrzyście</span>
             <button>Dowiedz sie więcej</button>
           </div>
-          <hr>
-          tu będą wyświetlane Statystyki
+          <div class="tab">
+            <button class="tablinks" onclick="openOption(event, 'Kategorie')">Kategorie</button>
+            <button class="tablinks" onclick="openOption(event, 'Przewidywany')">Przewidywany</button>
+            <button class="tablinks" onclick="openOption(event, 'Podsumowanie')">Podsumowanie</button>
+          </div>
+          <div id="Kategorie" class="categories_analysis tabcontent">
+            <div class="categories">
+              <div class="row">
+                <h4>Analiza na podstawie kategorii</h4>
+              </div>
+              <table class="scrolldown" id="categories_analysis">
+                <tr>
+                  <th class="categories_th">Nazwa kategorii</th>
+                  <th class="categories_th">Suma</th>
+                </tr>
+                
+              </table>
+            </div>
+          </div>
+          <div id="Przewidywany" class="predicted_analysis tabcontent">
+            <div class="predicted">
+              <div class="row">
+                <h4>Analiza na podstawie kategorii</h4>
+              </div>
+              <table class="scrolldown" id="predicted_analysis">
+                <tr>
+                  <th class="predicted_th">Miesiąc</th>
+                  <th class="predicted_th">Przewidywany</th>
+                  <th class="predicted_th">Rzeczywisty</th>
+                </tr>
+                
+              </table>
+            </div>
+          </div>
+          <div id="Podsumowanie" class="summary_analysis tabcontent">
+            <div class="summary">
+              <div class="row">
+                <h4>Analiza na podstawie kategorii</h4>
+              </div>
+              <table class="scrolldown" id="summary_analysis">
+                <tr>
+                  <th class="summary_th">Rok</th>
+                  <th class="summary_th">Przychód</th>
+                  <th class="summary_th">Wydatek</th>
+                  <th class="summary_th">Suma</th>
+                </tr>
+                
+              </table>
+            </div>
+          </div>
         </div>
     
         <div class="sidebar">
@@ -100,21 +148,106 @@
             }
           }
         })
-      </script>
-      <!--<script>
-        fetch('http://127.0.0.1:2345/services/list')
-        .then(response =>{
-          if(!response.ok){
-            throw new Error('Błąd połączenia');
+        function openOption(evt, option){
+          const baseUrl = 'http://127.0.0.1:2345/analysis/';
+          let i, tabcontent, tablinks;
+
+              tabcontent = document.getElementsByClassName('tabcontent');
+              for (i=0; i<tabcontent.length;i++){
+                tabcontent[i].style.display = 'none';
+              }
+
+              tablinks = document.getElementsByClassName('tablinks');
+              for (i=0;i<tablinks.length;i++){
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+              }
+
+              document.getElementById(option).style.display = 'block';
+              evt.currentTarget.className += " active";
+
+          if(option == 'Kategorie'){
+            let table = document.getElementById('categories_analysis');
+            
+            const paramData = {
+              date_from:null,
+              date_to:null,
+              all_categories:true
+            }
+            const query = new URLSearchParams(paramData).toString();
+            const url = `${baseUrl}categories?${query}`;
+            
+            fetch(url,{
+              method:'GET',
+              
+            }).then(response =>{
+              return response.json();
+            })
+            .then(data => {
+              console.log(data['cat_analytic']);
+              data['cat_analytic'].forEach((element) => {
+                
+                let tr = document.createElement('tr');
+                let vals = Object.values(element);
+                vals.forEach((elem) => {
+                  let td = document.createElement("td");
+                  td.innerText = elem;
+                  tr.appendChild(td);
+                });
+                table.appendChild(tr);
+              });
+
+            })
+          };
+          if(option == 'Przewidywany'){
+            let table = document.getElementById('predicted_analysis');
+            const predictedParam = {"date_from":null,
+                                    "date_to":null
+            };
+            const queryPredicted = new URLSearchParams(predictedParam).toString();
+            const predictedUrl = `${baseUrl}by_predictions?${queryPredicted}`;
+            fetch(predictedUrl,{
+              method:'GET'
+            }).then(response =>{
+              return response.json();
+            }).then(data =>{
+              console.log(data['pred_analitic'])
+              data['pred_analitic'].forEach((element) =>{
+                let tr = document.createElement('tr');
+                let vals = Object.values(element);
+                vals.forEach((item) =>{
+                  let td = document.createElement('td');
+                  td.innerText = item;
+                  tr.appendChild(td);
+                });
+                table.appendChild(tr);
+              })
+            })
+          };
+          if (option == 'Podsumowanie'){
+              let table = document.getElementById('summary_analysis');
+              const paramSummary = {date_from:null,date_to:null};
+              const querySummary = new URLSearchParams(paramSummary).toString();
+              const urlSummary = `${baseUrl}summary?${querySummary}`;
+
+              fetch(urlSummary,{
+                method:'GET'
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                data['summary'].forEach((element)=>{
+                  let tr = document.createElement('tr');
+                  let vals = Object.values(element);
+                  vals.forEach((item) =>{
+                    let td = document.createElement('td');
+                    td.innerText = item;
+                    tr.appendChild(td);
+                  });
+                  table.appendChild(tr);
+                })
+              })
           }
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-        })
-        .catch(error => {
-          console.error('Wystąpił błąd:',error);
-        });
-      </script>-->
+        };
+
+      </script>
     </body>
     </html>
