@@ -7,7 +7,7 @@ class GetDate(BaseModel):
     date_to: Optional[datetime]
 
 class GetCategories(GetDate):
-    user_id: int
+    user_id: int = None
     all_categories: bool = 1
 
 class ByCategories(BaseModel):
@@ -25,18 +25,19 @@ class ByCategoryList(BaseModel):
         orm_mode = True
 
 class GetPrediction(GetDate):
-    user_id: int
+    user_id: int = None
 
 class ByPrediction(BaseModel):
+    month: str
     predicted: float
     real: float
-    month: str
+    
 
 class ByPredictionList(BaseModel):
     pred_analitic: List[ByPrediction] = None
 
 class GetSummary(GetDate):
-    user_id: int
+    user_id: int = None
 class SummaryDetail(BaseModel):
     year: str
     income: float = 0.0

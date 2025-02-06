@@ -1,4 +1,6 @@
 from datetime import datetime
+import httpx
+import json
 from fastapi import APIRouter, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
@@ -31,6 +33,15 @@ templates= Jinja2Templates(Consts.TEMPLATES_PATH)
 route.mount('/static', StaticFiles(directory=Consts.STATIC_PATH), name='static')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+
+def get_params(params:dict):
+    params = dict(params)
+    for param in params:
+        if params[param] == 'null':
+            params[param] = None
+    
+    return params
+
 @route.get("/")
 async def main(request:Request):
     token = request.cookies.get('Authorization').replace('Bearer ','')
@@ -40,27 +51,26 @@ async def main(request:Request):
                                                                      'token':token,
                                                                      'user_id':user.id,
                                                                    'login':user.username})
-
+        
 @route.get('/categories')
-async def by_categories_all(request:GetCategories,token:str=Depends(oauth2_scheme)):
-    #token = request.cookies.get('Authorization').replace("Bearer ","")
+async def by_categories_all(request:Request):#,token:str=Depends(oauth2_scheme)
+    token = request.cookies.get('Authorization').replace("Bearer ","")
     user = await get_current_user(token)
-    date_from  = request.date_from 
-    date_to = request.date_to
+    params = get_params(request.query_params)
     
     with session_scope() as session:
         filters = []
         
-        filters.append(Money.user_id == request.user_id)
-        if date_from:
-            filters.append(Money.date >= date_from)
+        filters.append(Money.user_id == user.id)
+        if params.get('date_from'):
+            filters.append(Money.date >= params.get('date_from'))
 
-        if date_to:
-            filters.append(Money.date <= date_to)
+        if params.get('date_to'):
+            filters.append(Money.date <= params.get('date_to'))
         else:
             filters.append(Money.date <= datetime.now())
 
-        if request.all_categories == False:
+        if params.get("all_categories") == False:
             filters.append(Money.type=="false")
 
         query = session.query(Money.category,func.sum(Money.amount)).filter(and_(*filters)).group_by(Money.category)
@@ -79,19 +89,26 @@ async def by_categories_all(request:GetCategories,token:str=Depends(oauth2_schem
                                                      amount=category[1]))
             
         return ByCategoryList(cat_analytic=by_category_list)
-
+    """templates.TemplateResponse(name='analitics.html',context={
+            'request':request,
+            'token':token,
+            'user_id':user.id,
+            'login':user.username,
+            'categories_statistics':by_category_list})
+"""
 @route.get('/by_predictions')
-async def by_predictions(request:GetPrediction, token:str=Depends(oauth2_scheme)):
+async def by_predictions(request:Request):#, token:str=Depends(oauth2_scheme)
+    token = request.cookies.get('Authorization').replace('Bearer ','')
     user = await get_current_user(token)
-
+    params = get_params(request.query_params)
     with session_scope() as session:
         filters = []
 
-        filters.append(Predict.user_id==request.user_id)
-        if request.date_from:
-            filters.append(Predict.date>=request.date_from)
-        if request.date_to:
-            filters.append(Predict.date<=request.date_to)
+        filters.append(Predict.user_id==user.id)
+        if params.get('date_from'):
+            filters.append(Predict.date>=params.get('date_from'))
+        if params.get('date_to'):
+            filters.append(Predict.date<=params.get('date_to'))
         else:
             filters.append(Predict.date<=datetime.now())
 
@@ -110,18 +127,19 @@ async def by_predictions(request:GetPrediction, token:str=Depends(oauth2_scheme)
         return ByPredictionList(pred_analitic=by_predict_real_list)
 
 @route.get("/summary")
-async def summary(request:GetSummary,token:str = Depends(oauth2_scheme)):
+async def summary(request:Request):#,token:str = Depends(oauth2_scheme)
+    token = request.cookies.get('Authorization').replace('Bearer ','')
     user = await get_current_user(token)
-
+    params = get_params(request.query_params)
     with session_scope() as session:
         filters = []
 
-        filters.append(Money.user_id==request.user_id)
-        if request.date_from:
-            filters.append(Money.date>=request.date_from)
-        if request.date_to:
-            filters.append(Money.date<=request.date_to)
-            date = request.date_to.strftime("%Y")
+        filters.append(Money.user_id==user.id)
+        if params.get('date_from'):
+            filters.append(Money.date>=params.get('date_from'))
+        if params.get('date_to'):
+            filters.append(Money.date<=params.get('date_to'))
+            date = params.get('date_to').strftime("%Y")
         else:
             filters.append(Money.date<=datetime.now())
             date = datetime.now().year
