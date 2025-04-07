@@ -131,6 +131,7 @@ async def summary(request:Request):#,token:str = Depends(oauth2_scheme)
     token = request.cookies.get('Authorization').replace('Bearer ','')
     user = await get_current_user(token)
     params = get_params(request.query_params)
+    print("data do:",params.get('date_to'))
     with session_scope() as session:
         filters = []
 
@@ -139,7 +140,7 @@ async def summary(request:Request):#,token:str = Depends(oauth2_scheme)
             filters.append(Money.date>=params.get('date_from'))
         if params.get('date_to'):
             filters.append(Money.date<=params.get('date_to'))
-            date = params.get('date_to').strftime("%Y")
+            date = params.get('date_to').split("-")[0]
         else:
             filters.append(Money.date<=datetime.now())
             date = datetime.now().year
@@ -156,9 +157,9 @@ async def summary(request:Request):#,token:str = Depends(oauth2_scheme)
         
         detail = SummaryDetail(
             year=str(date),
-            income=income_query,
-            outcome=outcome_query,
-            saldo=saldo
+            income=round(income_query, 2),
+            outcome=round(outcome_query,2),
+            saldo=round(saldo, 2)
                         )
             
         response = SummaryList(
