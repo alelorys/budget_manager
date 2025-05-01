@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>Zarządzanie budżetem</title>
+        <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    </head>
+    <body>
+        <header class="header">
+            <div class="logo">
+              <a href="#">Budżet</a>
+            </div>
+        
+            <div class="header-icons">
+              <i class="fas fa-bell"></i>
+              <div class="account">
+                <h4><a href="/profile/page">{{ login }}</a></h4>
+              </div>
+            </div>
+          </header>
+          <div class="container">
+            <nav>
+              <div class="side_navbar">
+                <span>Menu</span>
+                <a href="/services/list" >Historia</a>
+                <a href="/analysis">Analiza</a>
+                <a href="/operations/form">Operacje</a>
+                <a href="/files">Pliki</a>
+                <a href="/budget/page">Budżet</a>
+                <a href="/categories/list">Kategorie</a>
+                <a href="/models" class="active">Modele</a>        
+                
+              </div>
+            </nav>
+        
+            <div class="main-body">
+    
+              
+            </div>    
+        
+            <div class="sidebar">
+              <h4>Podsumowanie</h4>
+              <div class="balance">
+                <i class="bx bx-coin-stack icon"></i>
+                <div class="info">
+                  <h5>Przewidywany</h5>
+                  {% if result %}
+                  <span>{{ result }} zł</span>
+                  {% else %}
+                  <span>0.00 zł</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="balance">
+                <i class="bx bxs-coin-stack icon"></i>
+                <div class="info">
+                  <h5>Rzeczywisty</h5>
+                  {% if balance %}
+                  <span>{{ balance }} zł</span>
+                  {% else %}
+                  <span>0.00 zł</span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="balance">
+                <i class='bx bx-coin icon' ></i>
+                <div class="info">
+                  <h5>Różnica</h5>
+                  {% if difference %}
+                  <span>{{ difference }} zł</span>
+                  {% else %}
+                  <span>0.00 zł</span>
+                  {% endif %}
+                </div>
+              </div>
+        
+            </div>
+          </div>
+    </body>
+</html>
