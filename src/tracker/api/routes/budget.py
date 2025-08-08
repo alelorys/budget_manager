@@ -13,7 +13,6 @@ from tracker.api.valid_user import get_current_user
 from tracker.api.validators.budget import Predict as valid_predict
 from tracker.consts import Consts
 from sqlalchemy import and_, func
-from tracker.predict.predict import train_model, get_categories_from_db
 
 route = APIRouter(
     prefix='/budget',
@@ -85,39 +84,39 @@ async def page(request: Request):
                                                                    'login':user.username,
                                                                    'items':monthly_payments,
                                                                    'predict_response':None})
-@route.post('/predict')
-async def predict(request: Request):
-    token = request.cookies.get('Authorization').replace('Bearer ','')
-    user = await get_current_user(token)
+# @route.post('/predict')
+# async def predict(request: Request):
+#     token = request.cookies.get('Authorization').replace('Bearer ','')
+#     user = await get_current_user(token)
     
-    model = train_model(user.id)
-    df:pd.DataFrame = get_categories_from_db(user.id)[1]
-    df.drop(columns=['Suma'], inplace=True)
-    result = model.predict(df.values)
+#     model = train_model(user.id)
+#     df:pd.DataFrame = get_categories_from_db(user.id)[1]
+#     df.drop(columns=['Suma'], inplace=True)
+#     result = model.predict(df.values)
     
-    days = get_last_month()
-    with session_scope() as session:
-        payments = session.query(Money).filter(
-            and_(
-                Money.user_id==user.id,
-                Money.date.between(days[0],days[-1]))).all()
+#     days = get_last_month()
+#     with session_scope() as session:
+#         payments = session.query(Money).filter(
+#             and_(
+#                 Money.user_id==user.id,
+#                 Money.date.between(days[0],days[-1]))).all()
         
-        total = sum([pay.amount for pay in payments if pay.type == 'true'])-sum([pay.amount for pay in payments if pay.type == 'false'])
+#         total = sum([pay.amount for pay in payments if pay.type == 'true'])-sum([pay.amount for pay in payments if pay.type == 'false'])
 
         
-        predicted = Predict(
-            predicted= round(result[0],2),
-            real= round(total, 2),
-            date=datetime.now(),
-            user_id= user.id
-        )
-        session.add(predicted)
+#         predicted = Predict(
+#             predicted= round(result[0],2),
+#             real= round(total, 2),
+#             date=datetime.now(),
+#             user_id= user.id
+#         )
+#         session.add(predicted)
 
-        return templates.TemplateResponse(name='budget.html', context={'request':request,
-                                                                   'token':token,
-                                                                   'user_id':user.id,
-                                                                   'login':user.username,
-                                                                   'predict_response':predicted})
+#         return templates.TemplateResponse(name='budget.html', context={'request':request,
+#                                                                    'token':token,
+#                                                                    'user_id':user.id,
+#                                                                    'login':user.username,
+#                                                                    'predict_response':predicted})
 
 @route.get('/month_check')
 async def month_check(request:Request):

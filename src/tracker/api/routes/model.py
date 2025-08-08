@@ -11,6 +11,8 @@ from tracker.db.db import Models, Users
 from tracker.predict import process_data, model as model_obj
 from tracker.consts import Consts
 
+from tracker.api.validators.services import MessageResponse
+
 
 # get models list
 # train new model
@@ -53,8 +55,7 @@ async def models_list(request:Request, token:str = Depends(oauth2_scheme)):
     
     user = await get_current_user(token)
     with session_scope() as session:
-        models = session.query(Users).filter(Users.id==user.id)\
-            .join(Models, Users.model_id == Models.id).all()
+        models = session.query(Models).filter(Models.user_id==user.id).all()
         
         model_list = []
         for model in models:
@@ -95,3 +96,47 @@ async def activate_model(model_request:Request):
         
         model.state = True
         session.commit()
+
+@route.options("/train")
+async def train_model(token:str = Depends(oauth2_scheme)):
+    '''
+    1. pobieramy dane w tym przypadku z pliku
+    2. przetwarzanie danych
+    3. zainicjowanie modelu
+    4. trenowanie modelu 
+    5. zapisanie modelu
+        - zapisanie do pliku
+        - zapisanie do bazy
+            {
+            name: model_name,
+            date: date,
+            state: None
+            }
+    '''
+    user = await get_current_user(token)
+    df = process_data.load_data_from_file()
+    df = process_data.prepare_data(data=df, from_file=True)
+
+    builded_model:model_obj.Model = model_obj.Model.build_model()
+    # trenowanie modelu
+    train:model_obj.Model = model_obj.Model.train_model(model=builded_model, data=df)
+
+    # zapisanie modelu
+    save_dict = model_obj.Model.save_model(model=train)
+
+    with session_scope() as session:
+        new_model = Models(
+            name = save_dict['model_name'],
+            date = save_dict['date'],
+            state = None,
+            model_path = save_dict['model_path'],
+            user_id = user.id
+        )
+
+        session.add(new_model)
+        session.commit
+    
+    return MessageResponse(message="New model training succeed")
+
+
+
