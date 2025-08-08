@@ -19,14 +19,11 @@ class Models(Base):
     name = Column(String)
     date = Column(DateTime)
     state = Column(Boolean, default = False)
-    date_range = Column(String, nullable = False)
-    path = Column(String, nullable = False)
 
     users = relationship("Users")
     def __repr__(self):
         return (f"Models(id = {self.id!r}, name = {self.name!r}, date = {self.date!r}, "
-                f"state = {self.state!r}, date_range = {self.date_range!r}, "
-                f"path = {self.path!r})")
+                f"state = {self.state!r}")
 class Users(Base):
     __tablename__ = 'users'
 
@@ -35,7 +32,7 @@ class Users(Base):
     name = Column(String)
     lastname = Column(String)
     password = Column(String)
-    model_id = Column(Integer, ForeignKey(Models.id), nullable = False)
+    model_id = Column(Integer, ForeignKey(Models.id))
 
     money = relationship("Money")
     bugdet = relationship("Predict")
