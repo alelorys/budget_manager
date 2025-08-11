@@ -8,6 +8,7 @@ from sqlalchemy import and_, func
 from tracker.api.valid_user import get_current_user
 from tracker.db.utils import session_scope
 from tracker.db.db import Models, Users
+from tracker.api.validators.models import DeleteModel, ActivateModel, ModelInfo, ModelList
 from tracker.predict import process_data, model as model_obj
 from tracker.consts import Consts
 
@@ -26,7 +27,7 @@ route = APIRouter(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
-@route.get('/')
+@route.get('/',response_model=ModelList)
 async def models_list(request:Request, token:str = Depends(oauth2_scheme)):
     '''
     endpoint ma wyświetlać listę modeli, pojedynczy wiersz zawiera: nazwę modelu, datę wytrenowania/dodania oraz status.
@@ -68,31 +69,31 @@ async def models_list(request:Request, token:str = Depends(oauth2_scheme)):
     
         return model_list
 
-@route.delete('/delete')
-async def remove_model(model_request:Request, token:str = Depends(oauth2_scheme)):
+@route.delete('/delete/{id}')
+async def remove_model(model_request:DeleteModel, token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        model = session.query(Models).filter(Models.name==model_request.model_name).first()
+        model = session.query(Models).filter(Models.id==model_request.id).first()
 
         if not model:
-            raise Exception(f'Model {model_request.model_name} not found')
+            raise Exception(f'Model {model_request.id} not found')
         
-        model = session.query(Models).filter(Models.name==model_request.model_name).delete()
+        model = session.query(Models).filter(Models.id==model_request.id).delete()
 
         if model == 0:
-            raise Exception(f'Model {model_request.model_name} not delete')
+            raise Exception(f'Model {model_request.id} not delete')
         else:
-            process_data.remove_model(model_request.model_name)
+            process_data.remove_model(model_request.id)
             return 200
         
-@route.put('/activate')       
-async def activate_model(model_request:Request):
+@route.put('/activate/{id}')       
+async def activate_model(model_request:ActivateModel):
     with session_scope() as session:
-        model = session.query(Models).filter(Models.name==model_request.model_name).first()
+        model = session.query(Models).filter(Models.id==model_request.id).first()
 
         if not model:
-            raise Exception(f'Model {model_request.model_name} not found')
+            raise Exception(f'Model {model_request.id} not found')
         
         model.state = True
         session.commit()
