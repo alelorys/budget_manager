@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from tracker.db.utils import Base, initialize_db, create_objects, SessionLocal, delete_objects
 
+
 class Users(Base):
     __tablename__ = 'users'
 
@@ -21,6 +22,7 @@ class Users(Base):
     lastname = Column(String)
     password = Column(String)
 
+    model = relationship("Models")
     money = relationship("Money")
     bugdet = relationship("Predict")
 
@@ -37,6 +39,20 @@ class Users(Base):
                 "lastname":self.lastname
             }
         }
+    
+class Models(Base):
+    __tablename__ = "models"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    date = Column(DateTime)
+    state = Column(Boolean, default = False)
+    model_path = Column(String)
+    user_id = Column(Integer, ForeignKey(Users.id),nullable=False)
+    
+    def __repr__(self):
+        return (f"Models(id = {self.id!r}, name = {self.name!r}, date = {self.date!r}, "
+                f"state = {self.state!r}, model_path = {self.model_path!r}, user_id={self.user_id!r}")
 class Money(Base):
     __tablename__ = 'money'
     
@@ -65,6 +81,8 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
+
+
 
 def create_db():
     

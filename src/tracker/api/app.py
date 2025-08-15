@@ -22,7 +22,8 @@ from tracker.api.routes import (
     budget, 
     categories,
     profile,
-    analitics)
+    analitics,
+    model)
 from tracker.consts import Consts
 from tracker.db.db import Users as user_db
 from tracker.api.validators.services import MessageResponse
@@ -126,6 +127,7 @@ app.include_router(budget.route)
 app.include_router(categories.route)
 app.include_router(profile.route)
 app.include_router(analitics.route)
+app.include_router(model.route)
 if __name__ == "__main__":
     uvicorn.run('app:app',
                 host='127.0.0.1',
