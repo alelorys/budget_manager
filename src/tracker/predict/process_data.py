@@ -27,8 +27,8 @@ def prepare_data(data:pd.DataFrame, from_file = False)->pd.DataFrame:
 def load_data_from_db():...
 
 def remove_model(model_name):
-    if not os.path.exists(f'{Consts.MODELS_PATH}/{model_name}'):
-        os.remove(f'{Consts.MODELS_PATH}/{model_name}')
+    if not os.path.exists(f'{model_name}'):
+        os.remove(f'{model_name}')
 
 
 

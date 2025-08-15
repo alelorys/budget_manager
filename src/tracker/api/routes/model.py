@@ -27,7 +27,7 @@ route = APIRouter(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
-@route.get('/',response_model=ModelList)
+@route.get('/')
 async def models_list(request:Request, token:str = Depends(oauth2_scheme)):
     '''
     endpoint ma wyświetlać listę modeli, pojedynczy wiersz zawiera: nazwę modelu, datę wytrenowania/dodania oraz status.
@@ -60,43 +60,46 @@ async def models_list(request:Request, token:str = Depends(oauth2_scheme)):
         
         model_list = []
         for model in models:
-            model: Models
+            
             model_list.append({
+                "id":model.id,
                 "model_name":model.name,
-                "date": model.date,
-                "status": model.state
+                "date":model.date,
+                "status":model.state
             })
     
         return model_list
 
 @route.delete('/delete/{id}')
-async def remove_model(model_request:DeleteModel, token:str = Depends(oauth2_scheme)):
+async def remove_model(id:int, token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        model = session.query(Models).filter(Models.id==model_request.id).first()
-
+        model = session.query(Models).filter(Models.id==id).first() 
+        model_path = model.model_path
         if not model:
-            raise Exception(f'Model {model_request.id} not found')
+            raise Exception(f'Model {id} not found')
         
-        model = session.query(Models).filter(Models.id==model_request.id).delete()
+        model = session.query(Models).filter(Models.id==id).delete()
 
         if model == 0:
-            raise Exception(f'Model {model_request.id} not delete')
+            raise Exception(f'Model {id} not delete')
         else:
-            process_data.remove_model(model_request.id)
+            process_data.remove_model(model_path)
             return 200
         
 @route.put('/activate/{id}')       
-async def activate_model(model_request:ActivateModel):
+async def activate_model(id:int,token:str = Depends(oauth2_scheme)):
+    user = await get_current_user(token)
     with session_scope() as session:
-        model = session.query(Models).filter(Models.id==model_request.id).first()
+        model = session.query(Models).filter(Models.id==id).first()
 
         if not model:
-            raise Exception(f'Model {model_request.id} not found')
+            raise Exception(f'Model {id} not found')
         
         model.state = True
         session.commit()
+        return MessageResponse(message="Model activated")
 
 @route.options("/train")
 async def train_model(token:str = Depends(oauth2_scheme)):

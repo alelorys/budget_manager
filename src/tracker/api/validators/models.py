@@ -10,6 +10,7 @@ class ActivateModel(BaseModel):
 
 
 class ModelInfo(BaseModel):
+    model_id: int
     model_name: str
     date: datetime
     status: bool
@@ -18,7 +19,7 @@ class ModelInfo(BaseModel):
         orm_mode = True
 
 class ModelList(BaseModel):
-    model_list: List[ModelInfo] = None
+    model_list: List[Any] = None
 
     class Config:
         orm_mode = True

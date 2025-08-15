@@ -3,6 +3,7 @@ import pathlib
 import datetime
 import pickle
 import joblib
+from functools import lru_cache
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from tracker.consts import Consts
@@ -26,8 +27,9 @@ class Model:
             pickle.dump(model,file)
         return {"model_name":model_name, "date":date, "model_path":model_path}
 
-    def load_model( model_name):
-        return pickle.load(open(os.path.join(Consts.MODELS_PATH,model_name), 'rb'))
+    @lru_cache(maxsize=None)
+    def load_model(model_path):
+        return pickle.load(open(model_path, 'rb'))
 
     def predict(model, data):
         return model.predict(data)
