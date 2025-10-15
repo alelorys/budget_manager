@@ -67,6 +67,26 @@ class Money(Base):
     def __repr__(self):
         return f"Money(id={self.id!r},user_id={self.user_id!r},name={self.name!r},type={self.type!r},date={self.date!r}, amount={self.amount!r},category={self.category!r})"
     
+class Budget(Base):
+    __tablename__ = 'budget'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    budget_date = Column(DateTime)
+
+    def __repr__(self):
+        return f"Budget(id={self.id!r}, budget_date={self.budget_date!r})"
+    
+class BudgetItems(Base):
+    __tablename__ = 'budget_items'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    budget_id = Column(Integer, ForeignKey("Budget.id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("Category.id", nullable=False))
+    planned_value = Column(Float)
+    real_value = Column(Float)
+
+    def __repr__(self):
+        return f"BudgetItems(id={self.id!r},budget_id={self.budget_id!r},category_id={self.category_id!r},planned_value={self.planned_value!r},real_value={self.real_value!r})"
 class Predict(Base):
     __tablename__ = "predict"
     

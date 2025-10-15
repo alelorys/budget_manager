@@ -84,6 +84,14 @@ async def page(request: Request):
                                                                    'login':user.username,
                                                                    'items':monthly_payments,
                                                                    'predict_response':None})
+
+
+@route.post('/plan_budget')
+async def plan_budget(budget_request,token:str = Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        ...
 # @route.post('/predict')
 # async def predict(request: Request):
 #     token = request.cookies.get('Authorization').replace('Bearer ','')
