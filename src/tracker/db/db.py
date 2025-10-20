@@ -72,7 +72,7 @@ class Budget(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     budget_date = Column(DateTime)
-
+    budget = relationship("BudgetItems")
     def __repr__(self):
         return f"Budget(id={self.id!r}, budget_date={self.budget_date!r})"
     
@@ -80,11 +80,12 @@ class BudgetItems(Base):
     __tablename__ = 'budget_items'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    budget_id = Column(Integer, ForeignKey("Budget.id"), nullable=False)
-    category_id = Column(Integer, ForeignKey("Category.id", nullable=False))
+    budget_id = Column(Integer, ForeignKey(Budget.id), nullable=False)
+    category_name = Column(String)
     planned_value = Column(Float)
     real_value = Column(Float)
 
+    
     def __repr__(self):
         return f"BudgetItems(id={self.id!r},budget_id={self.budget_id!r},category_id={self.category_id!r},planned_value={self.planned_value!r},real_value={self.real_value!r})"
 class Predict(Base):

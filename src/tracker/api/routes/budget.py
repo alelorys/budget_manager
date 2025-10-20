@@ -1,4 +1,5 @@
 import calendar
+from typing import List
 import pandas as pd
 from datetime import datetime, date
 from fastapi import APIRouter, HTTPException, Request, Depends
@@ -8,9 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from tracker.api.validators.services import MoneyResponse
 from tracker.db.utils import session_scope
-from tracker.db.db import Money, Predict
+from tracker.db.db import Money, Predict, Budget, BudgetItems
 from tracker.api.valid_user import get_current_user
-from tracker.api.validators.budget import Predict as valid_predict
+from tracker.api.validators.budget import Predict as valid_predict, AddBudget, AddBunch, BudgetItem
 from tracker.consts import Consts
 from sqlalchemy import and_, func
 
@@ -87,11 +88,45 @@ async def page(request: Request):
 
 
 @route.post('/plan_budget')
-async def plan_budget(budget_request,token:str = Depends(oauth2_scheme)):
+async def plan_budget(budget_request:AddBudget,token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        ...
+        budget = session.query(Budget).filter(Budget.budget_date == budget_request.budget_date).first()
+
+        if budget:
+            raise HTTPException(status_code=422, detail="Budget is planned for this month")
+        
+        new_budget: Budget = Budget(
+            budget_date = budget_request.budget_date
+        )
+
+        session.add(new_budget)
+        session.commit()
+
+@route.post('/plan_budget_items')
+async def plan_budget_items(budget_items_request: List[BudgetItem], token:str = Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        budget = session.query(Budget.id == budget_items_request[0].budget_id).first()
+
+        if not budget:
+            raise HTTPException(status_code=422, detail=f'Budget {budget.id} not found')
+       
+        new_items = []
+        for row in budget_items_request:
+            row: BudgetItem
+            new_item = BudgetItems(budget_id = row.budget_id,
+                                   category_name = row.category_name,
+                                   planned_value = row.planned_amount,
+                                   real_value = row.real_amount)
+            
+            new_items.append(new_item)
+        
+        session.bulk_save_objects(new_items)
+        session.commit()
+
 # @route.post('/predict')
 # async def predict(request: Request):
 #     token = request.cookies.get('Authorization').replace('Bearer ','')
