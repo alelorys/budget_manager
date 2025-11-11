@@ -87,7 +87,7 @@ class BudgetItems(Base):
 
     
     def __repr__(self):
-        return f"BudgetItems(id={self.id!r},budget_id={self.budget_id!r},category_id={self.category_id!r},planned_value={self.planned_value!r},real_value={self.real_value!r})"
+        return f"BudgetItems(id={self.id!r},budget_id={self.budget_id!r},category_name={self.category_name!r},planned_value={self.planned_value!r},real_value={self.real_value!r})"
 class Predict(Base):
     __tablename__ = "predict"
     

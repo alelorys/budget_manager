@@ -10,6 +10,8 @@ class Predict(BaseModel):
     class Config:
         orm_mode = True
 
+class DeleteRequest(BaseModel):
+    id: int
 class AddBudget(BaseModel):
     budget_date: datetime
 
@@ -17,7 +19,11 @@ class BudgetItem(BaseModel):
     budget_id: int
     category_name: str
     planned_amount: float
-    real_amount: float
+    real_amount: Optional[float] = None
 
-class AddBunch(BaseModel):
-    items: List[BudgetItem] = []
+class BudgetItemsList(BaseModel):
+    month: Optional[datetime] = None
+    items: Optional[List[BudgetItem]] = []
+
+    class Config:
+        orm_mode = True

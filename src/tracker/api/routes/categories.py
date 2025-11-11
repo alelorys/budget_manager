@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -21,8 +21,8 @@ route.mount('/static', StaticFiles(directory=Consts.STATIC_PATH))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 @route.get('/list')
-async def list(request:Request):
-    token = request.cookies.get('Authorization').replace('Bearer ','')
+async def list(request:Request, token:str=Depends(oauth2_scheme)):
+    #token = request.cookies.get('Authorization').replace('Bearer ','')
     user = await get_current_user(token)
 
     with session_scope() as session:

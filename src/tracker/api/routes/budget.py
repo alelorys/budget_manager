@@ -1,3 +1,5 @@
+import logging
+
 import calendar
 from typing import List
 import pandas as pd
@@ -11,9 +13,16 @@ from tracker.api.validators.services import MoneyResponse
 from tracker.db.utils import session_scope
 from tracker.db.db import Money, Predict, Budget, BudgetItems
 from tracker.api.valid_user import get_current_user
-from tracker.api.validators.budget import Predict as valid_predict, AddBudget, AddBunch, BudgetItem
+from tracker.api.validators.budget import (
+    Predict as valid_predict, 
+    AddBudget,
+    DeleteRequest, 
+    BudgetItemsList, 
+    BudgetItem)
 from tracker.consts import Consts
 from sqlalchemy import and_, func
+
+logging.basicConfig(level=logging.info)
 
 route = APIRouter(
     prefix='/budget',
@@ -86,6 +95,54 @@ async def page(request: Request):
                                                                    'items':monthly_payments,
                                                                    'predict_response':None})
 
+@route.get('/list/{budget_date}', response_model=BudgetItemsList)
+async def list(budget_date:datetime, token:str = Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+    
+    budget_date = budget_date.strftime('%Y-%m-%d %H:%M:%S')
+    with session_scope() as session:
+        budget_items = session.query(BudgetItems.budget_id,
+                                     BudgetItems.category_name,
+                                     BudgetItems.planned_value,
+                                     BudgetItems.real_value)\
+            .join(Budget, BudgetItems.budget_id==Budget.id)\
+        .where(Budget.budget_date == budget_date).all()
+
+        if not budget_items:
+            return  {'month':budget_date, 'items': []}
+        budget_items_list = [{'budget_id':budget_id,
+                              'category_name':category_name,
+                              'planned_amount':planned_value,
+                              'real_amount':real_value} for budget_id, category_name, planned_value, real_value in budget_items]
+        
+        response = {'month':budget_date, 'items':budget_items_list}
+        
+        return response
+
+
+@route.delete('/delete')
+async def delete_budget(delete_request:DeleteRequest, token:str=Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        budget = session.query(Budget).filter(Budget.id == delete_request.id).first()
+        msg = {}
+        if not budget:
+            raise HTTPException(status_code=404, detail='Budget not found')
+        
+        budget_items = session.query(BudgetItems).filter(BudgetItems.budget_id == delete_request.id).all()
+
+        if len(budget_items) > 0:
+            budget_items = session.query(BudgetItems).filter(BudgetItems.budget_id == delete_request.id).delete()
+            msg["message items"] = "All items for this budget got removed"
+
+        status = session.query(Budget).filter(Budget.id == delete_request.id).delete()
+
+        if status == 0:
+            raise HTTPException(status_code=421, detail='Budget not deleted')
+        else:
+            msg["message"] = "Budget succesfully removed"
+            return msg
 
 @route.post('/plan_budget')
 async def plan_budget(budget_request:AddBudget,token:str = Depends(oauth2_scheme)):
@@ -104,12 +161,13 @@ async def plan_budget(budget_request:AddBudget,token:str = Depends(oauth2_scheme
         session.add(new_budget)
         session.commit()
 
-@route.post('/plan_budget_items')
+@route.post('/plan_budget/items')
 async def plan_budget_items(budget_items_request: List[BudgetItem], token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
 
     with session_scope() as session:
-        budget = session.query(Budget.id == budget_items_request[0].budget_id).first()
+        logging.info(f"cos{budget_items_request[0]}")
+        budget = session.query(Budget).filter((Budget.id == budget_items_request[0].budget_id)).first()
 
         if not budget:
             raise HTTPException(status_code=422, detail=f'Budget {budget.id} not found')
@@ -127,6 +185,22 @@ async def plan_budget_items(budget_items_request: List[BudgetItem], token:str = 
         session.bulk_save_objects(new_items)
         session.commit()
 
+@route.delete('/plan_budget/delete_items')
+async def delete_items(delete_request:DeleteRequest, token:str=Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        budget_item = session.query(BudgetItems).filter(BudgetItems.id == delete_request.id).first()
+
+        if not budget_item:
+            raise HTTPException(status_code=404, detail='Item not found')
+        
+        status = session.query(BudgetItems).filter(BudgetItems.id == delete_request.id).delete()
+
+        if status == 0:
+            raise HTTPException(status_code=421, detail='Item not removed')
+        else:
+            return {'message':'Item succesfully removed'}
 # @route.post('/predict')
 # async def predict(request: Request):
 #     token = request.cookies.get('Authorization').replace('Bearer ','')
