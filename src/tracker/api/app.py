@@ -44,9 +44,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:2345"],  # Uwaga: w produkcji określ konkretne źródła
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 """

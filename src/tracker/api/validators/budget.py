@@ -27,3 +27,13 @@ class BudgetItemsList(BaseModel):
 
     class Config:
         orm_mode = True
+
+class Budget(BaseModel):
+    id: int
+    budget_date:datetime
+
+    class config:
+        orm_mode = True
+
+class Budgets(BaseModel):
+    budgets: Optional[List[Budget]] = []

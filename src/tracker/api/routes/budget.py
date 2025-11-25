@@ -11,14 +11,16 @@ from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from tracker.api.validators.services import MoneyResponse
 from tracker.db.utils import session_scope
-from tracker.db.db import Money, Predict, Budget, BudgetItems
+from tracker.db.db import Money, Predict, Budget as budget_db, BudgetItems
 from tracker.api.valid_user import get_current_user
 from tracker.api.validators.budget import (
     Predict as valid_predict, 
     AddBudget,
     DeleteRequest, 
     BudgetItemsList, 
-    BudgetItem)
+    BudgetItem,
+    Budget,
+    Budgets)
 from tracker.consts import Consts
 from sqlalchemy import and_, func
 
@@ -95,8 +97,29 @@ async def page(request: Request):
                                                                    'items':monthly_payments,
                                                                    'predict_response':None})
 
-@route.get('/list/{budget_date}', response_model=BudgetItemsList)
-async def list(budget_date:datetime, token:str = Depends(oauth2_scheme)):
+@route.get('/list', response_model=Budgets)
+async def list(token:str=Depends(oauth2_scheme)):
+    user = await get_current_user(token)
+
+    with session_scope() as session:
+        budget = session.query(budget_db).all()
+
+        if not budget:
+            raise HTTPException(status_code=422, detail="Not exists.")
+        
+        budget_list = []
+
+        for row in budget:
+            row: budget_db
+            budget_date:datetime = row.budget_date
+            budget_list.append({"id":row.id,
+                                "budget_date":budget_date.strftime('%Y-%m-%d %H:%M:%S')})   
+        logging.info(budget_list)    
+        return {"budgets":budget_list}
+
+
+@route.get('/list/items/{budget_date}', response_model=BudgetItemsList)
+async def items_list(budget_date:datetime, token:str = Depends(oauth2_scheme)):
     user = await get_current_user(token)
     
     budget_date = budget_date.strftime('%Y-%m-%d %H:%M:%S')
@@ -105,8 +128,8 @@ async def list(budget_date:datetime, token:str = Depends(oauth2_scheme)):
                                      BudgetItems.category_name,
                                      BudgetItems.planned_value,
                                      BudgetItems.real_value)\
-            .join(Budget, BudgetItems.budget_id==Budget.id)\
-        .where(Budget.budget_date == budget_date).all()
+            .join(budget_db, BudgetItems.budget_id==budget_db.id)\
+        .where(budget_db.budget_date == budget_date).all()
 
         if not budget_items:
             return  {'month':budget_date, 'items': []}
