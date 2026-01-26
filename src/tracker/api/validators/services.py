@@ -35,7 +35,7 @@ class PredictResponse(BaseModel):
     user_id:int
     predicted: float
     real: float
-    month: str
+    month_year: str
 class MoneyList(BaseModel):
     operations: List[MoneyResponse]
     predicted: List[PredictResponse]

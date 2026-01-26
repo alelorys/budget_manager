@@ -54,7 +54,7 @@ async def show_all(request: Request):
                     user_id=predict.user_id,
                     predicted=round(predict.predicted, 2),
                     real=round(predict.real, 2),
-                    month=date.strftime("%B")
+                    month_year=date.strftime("%B/%Y")
                 ))  
 
         summary = {}

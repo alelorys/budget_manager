@@ -11,16 +11,18 @@ from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 from tracker.api.validators.services import MoneyResponse
 from tracker.db.utils import session_scope
-from tracker.db.db import Money, Predict, Budget as budget_db, BudgetItems
+from tracker.db.db import Money, Predict, Budget as budget_db, BudgetItems, Category
 from tracker.api.valid_user import get_current_user
 from tracker.api.validators.budget import (
     Predict as valid_predict, 
     AddBudget,
+    EditBudgetItems,
     DeleteRequest, 
     BudgetItemsList, 
     BudgetItem,
     Budget,
-    Budgets)
+    Budgets,
+    CategoryItemsList)
 from tracker.consts import Consts
 from sqlalchemy import and_, func
 
@@ -98,8 +100,8 @@ async def page(request: Request):
                                                                    'predict_response':None})
 
 @route.get('/list', response_model=Budgets)
-async def list(token:str=Depends(oauth2_scheme)):
-    user = await get_current_user(token)
+def list():#token:str=Depends(oauth2_scheme)
+    #user = await get_current_user(token)
 
     with session_scope() as session:
         budget = session.query(budget_db).all()
@@ -113,7 +115,7 @@ async def list(token:str=Depends(oauth2_scheme)):
             row: budget_db
             budget_date:datetime = row.budget_date
             budget_list.append({"id":row.id,
-                                "budget_date":budget_date.strftime('%Y-%m-%d %H:%M:%S')})   
+                                "budget_date":budget_date.strftime('%Y-%m-%d')})   
         logging.info(budget_list)    
         return {"budgets":budget_list}
 
@@ -167,17 +169,33 @@ async def delete_budget(delete_request:DeleteRequest, token:str=Depends(oauth2_s
             msg["message"] = "Budget succesfully removed"
             return msg
 
-@route.post('/plan_budget')
-async def plan_budget(budget_request:AddBudget,token:str = Depends(oauth2_scheme)):
-    user = await get_current_user(token)
+@route.get('/categories_names', response_model=CategoryItemsList)
+def categories_names():#token:str = Depends(oauth2_scheme)
+    #user = await get_current_user(token)
 
     with session_scope() as session:
-        budget = session.query(Budget).filter(Budget.budget_date == budget_request.budget_date).first()
+        categories = session.query(Category).all()
+        logging.info(categories)
+        if not categories:
+            return CategoryItemsList(categories=[])
+        categories_list = []
+        for row in categories:
+            row: Category
+            categories_list.append(row.name)
+        logging.info(categories_list)
+        return CategoryItemsList(categories=categories_list)
+    
+@route.post('/plan_budget')
+def plan_budget(budget_request:AddBudget):#,token:str = Depends(oauth2_scheme)
+    #user = await get_current_user(token)
+
+    with session_scope() as session:
+        budget = session.query(budget_db).filter(budget_db.budget_date == budget_request.budget_date).first()
 
         if budget:
             raise HTTPException(status_code=422, detail="Budget is planned for this month")
         
-        new_budget: Budget = Budget(
+        new_budget = budget_db(
             budget_date = budget_request.budget_date
         )
 
@@ -185,28 +203,49 @@ async def plan_budget(budget_request:AddBudget,token:str = Depends(oauth2_scheme
         session.commit()
 
 @route.post('/plan_budget/items')
-async def plan_budget_items(budget_items_request: List[BudgetItem], token:str = Depends(oauth2_scheme)):
-    user = await get_current_user(token)
+def plan_budget_items(budget_items_request: BudgetItemsList[BudgetItem]):#, token:str = Depends(oauth2_scheme)
+    #user = await get_current_user(token)
 
     with session_scope() as session:
-        logging.info(f"cos{budget_items_request[0]}")
-        budget = session.query(Budget).filter((Budget.id == budget_items_request[0].budget_id)).first()
+        logging.info(f"cos{budget_items_request['items'][0]}")
+        budget = session.query(budget_db).filter((budget_db.id == budget_items_request['items'][0].budget_id)).first()
 
         if not budget:
             raise HTTPException(status_code=422, detail=f'Budget {budget.id} not found')
        
         new_items = []
-        for row in budget_items_request:
+        for row in budget_items_request['items']:
             row: BudgetItem
             new_item = BudgetItems(budget_id = row.budget_id,
+                                   name = row.name,
                                    category_name = row.category_name,
                                    planned_value = row.planned_amount,
-                                   real_value = row.real_amount)
+                                   real_value = row.real_amount,
+                                   fixed = row.main)
             
             new_items.append(new_item)
         
         session.bulk_save_objects(new_items)
         session.commit()
+
+@route.put('/item_modify')
+async def edit_bugdet_items(edit_request:EditBudgetItems, token:str = Depends(oauth2_scheme)):
+    user = get_current_user(token)
+
+    with session_scope() as session:
+     budget_items = session.query(BudgetItems).where(BudgetItems.id==edit_request.id).first()
+
+     if not budget_items:
+         raise HTTPException(status_code=422, detail="Item not found")
+     
+     
+     budget_items.category_name = edit_request.category_name
+     budget_items.planned_value = edit_request.planned_amount
+     budget_items.real_value = edit_request.real_amount
+
+     session.commit()
+
+     return "Items modified successfully"
 
 @route.delete('/plan_budget/delete_items')
 async def delete_items(delete_request:DeleteRequest, token:str=Depends(oauth2_scheme)):

@@ -24,7 +24,8 @@ class Users(Base):
 
     model = relationship("Models")
     money = relationship("Money")
-    bugdet = relationship("Predict")
+    predict = relationship("Predict")
+    budget = relationship("Budget")
 
     def __repr__(self):
         return f"Users(id={self.id!r}, login={self.login!r}, name={self.name!r}, lastname={self.lastname!r}, password={self.password!r})"
@@ -71,8 +72,10 @@ class Budget(Base):
     __tablename__ = 'budget'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey(Users.id))
     budget_date = Column(DateTime)
     budget = relationship("BudgetItems")
+
     def __repr__(self):
         return f"Budget(id={self.id!r}, budget_date={self.budget_date!r})"
     
@@ -81,9 +84,11 @@ class BudgetItems(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     budget_id = Column(Integer, ForeignKey(Budget.id), nullable=False)
+    name = Column(String,nullable=True)
     category_name = Column(String)
     planned_value = Column(Float)
     real_value = Column(Float)
+    fixed = Column(Boolean, default=False)
 
     
     def __repr__(self):
@@ -103,7 +108,8 @@ class Category(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
 
-
+    def __repr__(self):
+        return f"Category(id={self.id!r}, name={self.name!r})"
 
 def create_db():
     
